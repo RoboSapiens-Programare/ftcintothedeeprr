@@ -8,7 +8,7 @@ import org.firstinspires.ftc.teamcode.robot.Robot;
 
 public class LinearDriveMode extends LinearOpMode {
     private Robot robot = null;
-    private UniversalValues values = new UniversalValues();
+    private UniversalValues Values = new UniversalValues();
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -26,35 +26,16 @@ public class LinearDriveMode extends LinearOpMode {
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-            if(gamepad1.cross){
-                robot.intake.setPivot(values.INTAKE_UP);
-            }
-            if(gamepad1.circle){
-                robot.intake.setPivot(values.INTAKE_DOWN);
-            }
-            if(gamepad1.triangle){
-                robot.outtake.setPivot(values.OUTTAKE_UP);
-            }
-            if(gamepad1.square){
-                robot.outtake.setPivot(values.OUTTAKE_DOWN);
-            }
-            if(gamepad1.dpad_down){
-                robot.intake.CloseIntake(values.CLAW_CLOSE);
-            }
-            if(gamepad1.dpad_right){
-                robot.intake.CloseIntake(values.CLAW_OPEN);
-            }
-            if(gamepad1.dpad_left){
-                robot.outtake.CloseOuttake(values.OUTTAKE_CLOSE);
-            }
-            if(gamepad1.dpad_up){
-                robot.outtake.OpenOuttake(values.OUTTAKE_OPEN);
-            }
             if(gamepad1.right_bumper){
-                robot.intake.setClawPivot(values.CLAW_HORIZONTAL);
-            }
-            if(gamepad1.left_bumper){
-                robot.intake.setClawPivot(values.CLAW_VERTICAL);
+                robot.intake.CloseIntake(Values.CLAW_CLOSE);
+                robot.outtake.setPivot(Values.OUTTAKE_DOWN);
+                robot.intake.setPivot(Values.INTAKE_INT);
+                sleep(50);
+                robot.intake.setPivot(Values.INTAKE_UP);
+                sleep(2000);
+                robot.intake.CloseIntake(Values.CLAW_OPEN);
+                sleep(500);
+                robot.intake.setPivot(Values.INTAKE_DOWN);
             }
         }
 
