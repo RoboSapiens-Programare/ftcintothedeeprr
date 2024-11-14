@@ -14,6 +14,6 @@ public class UniversalValues {
 
     public static double OUTTAKE_UP = 0.9;
     public static double OUTTAKE_DOWN = 0.41;
-    public static double OUTTAKE_OPEN = 0.5;
-    public static double OUTTAKE_CLOSE = 0.5;
+    public static double OUTTAKE_OPEN = 0.3;
+    public static double OUTTAKE_CLOSE = 0.61;
 }
