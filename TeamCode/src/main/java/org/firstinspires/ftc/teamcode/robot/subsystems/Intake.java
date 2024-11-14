@@ -4,11 +4,14 @@ import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 public class Intake {
     public Servo pivotin, pivotIntake, intake;
 
     public DcMotorEx intakeMotor;
+
+    public TouchSensor intakeLimit;
 
     public Intake(HardwareMap hardwareMap) {
         intake = hardwareMap.get(Servo.class, "intake");
@@ -17,6 +20,8 @@ public class Intake {
         pivotIntake = hardwareMap.get(Servo.class, "pivotIntake");
 
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
+
+        intakeLimit = hardwareMap.get(TouchSensor.class, "intakeLimit");
 
         pivotin.setDirection(Servo.Direction.FORWARD);
         intakeMotor.setDirection(DcMotorEx.Direction.FORWARD);
@@ -36,7 +41,7 @@ public class Intake {
         {
             intakeMotor.setPower(power);
         }
-        else
+        else if(!intakeLimit.isPressed() && intakeMotor.getCurrentPosition() > ManualTarget)
         {
             intakeMotor.setPower(-power);
         }

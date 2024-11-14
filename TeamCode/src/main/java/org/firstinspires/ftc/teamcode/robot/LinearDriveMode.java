@@ -37,6 +37,8 @@ public class LinearDriveMode extends LinearOpMode {
                 sleep(500);
                 robot.intake.setPivot(Values.INTAKE_DOWN);
             }
+            telemetry.addData("Touch Sensor State: ", robot.intake.intakeLimit.isPressed());
+            telemetry.update();
         }
 
 
