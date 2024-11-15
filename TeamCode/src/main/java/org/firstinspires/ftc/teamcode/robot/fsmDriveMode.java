@@ -100,9 +100,9 @@ public class fsmDriveMode extends OpMode {
                 break;
             case INTAKE_RETRACT:
                 robot.intake.setPivot(UniversalValues.INTAKE_UP);
-                    robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
                 if(robot.intake.intakeLimit.isPressed()){
                     intakeState = IntakeState.INTAKE_START;
+                    robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
                     intakeTimer.reset();
                 }
 
