@@ -12,6 +12,7 @@ public class LinearDriveMode extends LinearOpMode {
     public int manualTarget = 0;
 
 
+
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry.addData(">", "Initializing...");
@@ -28,7 +29,7 @@ public class LinearDriveMode extends LinearOpMode {
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-
+            /*
             if(gamepad1.cross){
                 robot.intake.setPivot(Values.INTAKE_UP);
             }
@@ -58,6 +59,20 @@ public class LinearDriveMode extends LinearOpMode {
             }
             if(gamepad1.left_bumper) {
                 robot.intake.setClawPivot(Values.CLAW_VERTICAL);
+            }
+
+             */
+
+
+
+            if(gamepad1.cross){
+                robot.intake.setPivot(Values.INTAKE_UP);
+            }
+            if(gamepad1.circle){
+                robot.intake.setPivot(Values.INTAKE_DOWN);
+            }
+            if(gamepad1.triangle){
+                robot.intake.setPivot(Values.INTAKE_MIDDLE);
             }
 
             if(gamepad1.right_trigger > 0.1){
