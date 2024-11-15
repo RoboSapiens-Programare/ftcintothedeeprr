@@ -64,6 +64,7 @@ public class fsmDriveMode extends OpMode {
                 }
 
                 break;
+
             case INTAKE_EXTEND:
                 if(Math.abs(robot.intake.intakeMotor.getCurrentPosition() - INTAKE_EXTEND) < 10){
                    robot.intake.setPivot(UniversalValues.INTAKE_DOWN);
@@ -73,6 +74,7 @@ public class fsmDriveMode extends OpMode {
                    intakeState = IntakeState.INTAKE_CLAW_COLLECT_POSITION;
                 }
                 break;
+
             case INTAKE_CLAW_COLLECT_POSITION:
                 if(gamepad1.right_bumper){
                     robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
@@ -96,24 +98,29 @@ public class fsmDriveMode extends OpMode {
                     robot.intake.setPivot(UniversalValues.INTAKE_INT);
                     robot.intake.ManualLevel(INTAKE_LOW, 1);
                     intakeState = IntakeState.INTAKE_RETRACT;
-                }
-                break;
-            case INTAKE_RETRACT:
-                robot.intake.setPivot(UniversalValues.INTAKE_UP);
-                if(robot.intake.intakeLimit.isPressed()){
-                    intakeState = IntakeState.INTAKE_START;
-                    robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
                     intakeTimer.reset();
                 }
-
                 break;
+
+            case INTAKE_RETRACT:
+                robot.intake.setPivot(UniversalValues.INTAKE_UP);
+                if(intakeTimer.seconds() > 3){
+                    robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
+                }
+                if(robot.intake.intakeLimit.isPressed()){
+                    intakeState = IntakeState.INTAKE_START;
+                    intakeTimer.reset();
+                }
+                break;
+
                 default:
                     intakeState = IntakeState.INTAKE_START;
                 break;
         }
 
         if (gamepad1.y && intakeState != IntakeState.INTAKE_START) {
-            intakeState = IntakeState.INTAKE_START;
+            intakeState = IntakeState.INTAKE_RETRACT;
+            robot.intake.setPivot(UniversalValues.INTAKE_INT);
         }
 
         robot.drive.setDrivePower(new Pose2d((-gamepad1.left_stick_y) * 0.8,(-gamepad1.left_stick_x) * 0.8,(-gamepad1.right_stick_x) * 0.8));
