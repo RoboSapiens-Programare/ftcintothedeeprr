@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot;
 
+import android.renderscript.Sampler;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.robot.Robot;
@@ -29,51 +31,56 @@ public class LinearDriveMode extends LinearOpMode {
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
-            /*
-            if(gamepad1.cross){
+
+            if(gamepad1.triangle){
+                robot.intake.setPivot(Values.INTAKE_UP);
+            } else if (gamepad2.triangle) {
                 robot.intake.setPivot(Values.INTAKE_UP);
             }
-            if(gamepad1.circle){
+
+            if(gamepad1.cross){
+                robot.intake.setPivot(Values.INTAKE_DOWN);
+            } else if (gamepad2.cross) {
                 robot.intake.setPivot(Values.INTAKE_DOWN);
             }
-            if(gamepad1.triangle){
-                robot.outtake.setPivot(Values.OUTTAKE_UP);
+
+
+            if(gamepad1.circle){
+                robot.outtake.setPivot(Values.OUTTAKE_DUMP);
             }
             if(gamepad1.square){
-                robot.outtake.setPivot(Values.OUTTAKE_DOWN);
+                robot.outtake.setPivot(Values.OUTTAKE_COLLECT);
             }
             if(gamepad1.dpad_down){
                 robot.intake.CloseIntake(Values.CLAW_CLOSE);
             }
-            if(gamepad1.dpad_right){
+            if(gamepad1.dpad_up){
                 robot.intake.CloseIntake(Values.CLAW_OPEN);
             }
-            if(gamepad1.dpad_left){
+            if(gamepad2.dpad_left){
+                robot.outtake.CloseOuttake(Values.OUTTAKE_CLOSE);
+            } else if (gamepad1.dpad_left) {
                 robot.outtake.CloseOuttake(Values.OUTTAKE_CLOSE);
             }
-            if(gamepad1.dpad_up){
+
+            if(gamepad2.dpad_right){
+                robot.outtake.OpenOuttake(Values.OUTTAKE_OPEN);
+            } else if (gamepad1.dpad_right) {
                 robot.outtake.OpenOuttake(Values.OUTTAKE_OPEN);
             }
-            if(gamepad1.right_bumper){
+
+            if(gamepad2.right_bumper){
+                robot.intake.setClawPivot(Values.CLAW_VERTICAL);
+            } else {
                 robot.intake.setClawPivot(Values.CLAW_HORIZONTAL);
             }
-            if(gamepad1.left_bumper) {
+
+            if(gamepad1.right_bumper){
                 robot.intake.setClawPivot(Values.CLAW_VERTICAL);
+            } else {
+                robot.intake.setClawPivot(Values.CLAW_HORIZONTAL);
             }
 
-             */
-
-
-
-            if(gamepad1.cross){
-                robot.intake.setPivot(Values.INTAKE_UP);
-            }
-            if(gamepad1.circle){
-                robot.intake.setPivot(Values.INTAKE_DOWN);
-            }
-            if(gamepad1.triangle){
-                robot.intake.setPivot(Values.INTAKE_MIDDLE);
-            }
 
             if(gamepad1.right_trigger > 0.1){
                 robot.intake.ManualLevel(manualTarget, 1);
