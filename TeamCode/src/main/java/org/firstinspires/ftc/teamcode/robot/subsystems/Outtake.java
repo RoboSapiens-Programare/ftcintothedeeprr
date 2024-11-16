@@ -33,11 +33,11 @@ public class Outtake {
 
         if(outtakeMotor.getCurrentPosition() < ManualTarget)
         {
-            outtakeMotor.setPower(power);
+            outtakeMotor.setPower(-power);
         }
         else
         {
-            outtakeMotor.setPower(-power);
+            outtakeMotor.setPower(power);
         }
     }
 
