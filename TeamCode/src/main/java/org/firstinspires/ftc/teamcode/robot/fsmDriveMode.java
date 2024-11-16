@@ -17,6 +17,7 @@ public class fsmDriveMode extends OpMode {
     private ElapsedTime intakeTimer = new ElapsedTime();
     private ElapsedTime outtakeTimer = new ElapsedTime();
     private boolean isHorizontal = true;
+    private boolean isStarted = true;
     public enum IntakeState {
         INTAKE_START,
         INTAKE_CLAW_COLLECT_POSITION,
@@ -44,7 +45,7 @@ public class fsmDriveMode extends OpMode {
         robot.intake.ManualLevel(0,1);
         robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
         robot.intake.setClawPivot(UniversalValues.CLAW_HORIZONTAL);
-        robot.intake.setPivot(UniversalValues.INTAKE_INT);
+        robot.intake.setPivot(UniversalValues.INTAKE_INIT);
         robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT);
         robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
     }
@@ -52,11 +53,15 @@ public class fsmDriveMode extends OpMode {
     public void loop(){
         switch(intakeState){
             case INTAKE_START:
+                if(isStarted){
+                    robot.intake.setPivot(UniversalValues.INTAKE_INT);
+                    isStarted = false;
+                }
                 if(gamepad1.right_trigger > 0.1){
                     robot.intake.ManualLevel(INTAKE_EXTEND, 1);
                     intakeState = IntakeState.INTAKE_EXTEND;
                 }
-                if(intakeTimer.seconds() > 1){
+                if(intakeTimer.seconds() > 0.8){
                     robot.intake.setPivot(UniversalValues.INTAKE_INT);
                     robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
                 }
@@ -119,14 +124,14 @@ public class fsmDriveMode extends OpMode {
 
             case OUTTAKE_MID:
                 if(gamepad2.cross){
-                    robot.outtake.ManualLevel(OUTTAKE_LOW, 0.6);
+                    robot.outtake.ManualLevel(OUTTAKE_LOW, 0.4);
                     intakeState = IntakeState.OUTTAKE_RETRACT;
                 }
                 robot.outtake.setPivot(UniversalValues.OUTTAKE_DUMP);
                 if(gamepad2.right_bumper){
                     robot.outtake.OpenOuttake(UniversalValues.OUTTAKE_OPEN);
                 }
-                if(Math.abs(robot.outtake.outtakeMotor.getCurrentPosition() - OUTTAKE_EXTEND_MID) < 10){
+                if(Math.abs(robot.outtake.outtakeMotor.getCurrentPosition() - OUTTAKE_EXTEND_MID) < 100){
                     if(gamepad2.triangle){
                         robot.outtake.ManualLevel(OUTTAKE_EXTEND, 1);
                         intakeState = IntakeState.OUTTAKE_EXTEND;
@@ -136,7 +141,7 @@ public class fsmDriveMode extends OpMode {
 
             case OUTTAKE_EXTEND:
                 if(gamepad2.cross){
-                    robot.outtake.ManualLevel(OUTTAKE_LOW, 0.6);
+                    robot.outtake.ManualLevel(OUTTAKE_LOW, 0.4);
                     intakeState = IntakeState.OUTTAKE_RETRACT;
                 }
                 robot.outtake.setPivot(UniversalValues.OUTTAKE_DUMP);
