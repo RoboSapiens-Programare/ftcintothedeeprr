@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.robot;
 
 
+import static org.firstinspires.ftc.teamcode.robot.UniversalValues.CLAW_HORIZONTAL;
+import static org.firstinspires.ftc.teamcode.robot.UniversalValues.CLAW_VERTICAL;
 import static org.firstinspires.ftc.teamcode.robot.UniversalValues.INTAKE_EXTEND;
 import static org.firstinspires.ftc.teamcode.robot.UniversalValues.OUTTAKE_EXTEND;
 import static org.firstinspires.ftc.teamcode.robot.UniversalValues.OUTTAKE_EXTEND_MID;
@@ -10,6 +12,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp(name = "FSM DRIVE MODE", group = "FSMTELEOP")
 public class fsmDriveMode extends OpMode {
@@ -93,14 +97,18 @@ public class fsmDriveMode extends OpMode {
                     robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
                     robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT);
                 }
-                if(gamepad1.dpad_right){
+
+                if(gamepad1.dpad_left){
                     robot.intake.setClawPivot(UniversalValues.CLAW_VERTICAL);
                     isHorizontal = false;
                 }
-                if(gamepad1.dpad_left){
+                if(gamepad1.dpad_right){
                     robot.intake.setClawPivot(UniversalValues.CLAW_HORIZONTAL);
                     isHorizontal = true;
                 }
+
+
+
                 if(gamepad1.left_trigger > 0.1){
                     robot.outtake.OpenOuttake(UniversalValues.OUTTAKE_OPEN);
                     robot.intake.setClawPivot(UniversalValues.CLAW_HORIZONTAL);
