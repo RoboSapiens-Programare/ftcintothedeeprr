@@ -4,11 +4,13 @@ import com.arcrobotics.ftclib.hardware.ServoEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class Outtake {
     public Servo pivotOut1, pivotOut2, outtake;
+    public DistanceSensor outtakeSensor;
     public DcMotorEx outtakeMotor;
 
     public Outtake(HardwareMap hardwareMap){
@@ -18,8 +20,11 @@ public class Outtake {
 
         outtakeMotor = hardwareMap.get(DcMotorEx.class, "outtakeMotor");
 
+        outtakeSensor = hardwareMap.get(DistanceSensor.class, "outtakeSensor");
+
         outtakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         outtakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
     }
 
     public void setPivot(double position){
