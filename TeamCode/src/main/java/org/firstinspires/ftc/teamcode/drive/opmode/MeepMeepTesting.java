@@ -45,7 +45,14 @@ public class MeepMeepTesting extends LinearOpMode {
             Pose2d start = new Pose2d(-10, 61.5, Math.toRadians(-90));
             robot.drive.setPoseEstimate(start);
             TrajectorySequence trajectory1 = robot.drive.trajectorySequenceBuilder(start)
-                    .forward(5)
+
+                    .strafeRight(25)
+                    .forward(35)
+                    .strafeRight(15)
+                    .forward(15)
+                    .strafeRight(10)
+                    .back(40)
+                    .lineToLinearHeading(new Pose2d(47, 52, Math.toRadians(-90)))
                     .lineToLinearHeading(new Pose2d(52, 52, Math.toRadians(-135)))
                     .build();
 
