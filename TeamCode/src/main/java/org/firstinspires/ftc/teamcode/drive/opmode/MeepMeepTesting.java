@@ -2,44 +2,59 @@ package org.firstinspires.ftc.teamcode.drive.opmode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
-@Autonomous(group = "drive")
+import org.firstinspires.ftc.teamcode.robot.Robot;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
+
+
+@Autonomous(name = "Autonomie_ALBASTRU_APROAPE", group="autonomous")
+
 public class MeepMeepTesting extends LinearOpMode {
+    private Robot robot = null;
 
-    public static double DISTANCE = 20;
 
-    double xoffset = -10;
-    double yoffset = 61.5;
 
-    @Override
-    public void runOpMode() throws InterruptedException {
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
-        Trajectory trajectory1 = drive.trajectoryBuilder(new Pose2d())
-                .strafeRight(37)
-                .forward(10)
-                .lineToLinearHeading(new Pose2d(52, 52, Math.toRadians(-135)))
-                .lineToLinearHeading(new Pose2d(xoffset-48, yoffset-10,  Math.toRadians(-90)))
-                .lineToLinearHeading(new Pose2d(52, 52, Math.toRadians(-135)))
-                .lineToLinearHeading(new Pose2d(-40, 40,  Math.toRadians(180)))
-                .lineToLinearHeading(new Pose2d(-40, 25,  Math.toRadians(180)))
-                .lineToLinearHeading(new Pose2d(-40, 40,  Math.toRadians(180)))
-                .lineToLinearHeading(new Pose2d(52, 52, Math.toRadians(-135)))
-                .lineToLinearHeading(new Pose2d(47, 52, Math.toRadians(-90)))
-                .lineToLinearHeading(new Pose2d(52, 52, Math.toRadians(-135)))
-                .build();
+    public void runOpMode() {
+        telemetry.addData(">", "Initializing...");
+        robot = new Robot(hardwareMap);
+
+        telemetry.addData("has initialised", "yes");
+        while (robot.isInitialize() && opModeIsActive()) {
+            idle();
+        }
+
+        telemetry.addData(">", "Initialized");
+        telemetry.setMsTransmissionInterval(50);
+
+        telemetry.update();
+
 
 
 
         waitForStart();
 
-        while (opModeIsActive() && !isStopRequested()) {
-            drive.followTrajectory(trajectory1);
+
+
+        while (opModeIsActive()) {
+            Pose2d start = new Pose2d(-10, 61.5, Math.toRadians(-90));
+            robot.drive.setPoseEstimate(start);
+            TrajectorySequence trajectory1 = robot.drive.trajectorySequenceBuilder(start)
+                    .forward(5)
+                    .lineToLinearHeading(new Pose2d(52, 52, Math.toRadians(-135)))
+                    .build();
+
+            robot.drive.followTrajectorySequence(trajectory1);
+            sleep(100000);
         }
+
+
+        //        telemetry.addData("Status", "Run Time: " + runtime.toString());
+        telemetry.update();
     }
 }
