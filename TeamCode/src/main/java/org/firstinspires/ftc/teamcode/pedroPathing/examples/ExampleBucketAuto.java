@@ -127,9 +127,6 @@ public class ExampleBucketAuto extends OpMode {
             case 0:
 
                 //GOES TO SCORE POSITION
-                if(opmodeTimer.getElapsedTimeSeconds() > 27){
-                    setPathState(9);
-                }
                 robot.intake.setPivot(UniversalValues.INTAKE_INT);
                 robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND_MID,1);
                 follower.followPath(scorePreload, true);
@@ -140,9 +137,6 @@ public class ExampleBucketAuto extends OpMode {
             case 1:
 
                 //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES PRELOAD, GOES TO GRABBING FIRST SAMPLE POSITION AND HOLDS
-                if(opmodeTimer.getElapsedTimeSeconds() > 27){
-                    setPathState(9);
-                }
                 if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1))) {
                         if(actionTimer.getElapsedTimeSeconds() > 3){
                                 robot.outtake.OpenOuttake(UniversalValues.OUTTAKE_OPEN);
@@ -166,9 +160,6 @@ public class ExampleBucketAuto extends OpMode {
             case 2:
 
                 //CHECKS IF ROBOT IS AT GRAB POSITION, GRABS SAMPLE, GOES TO SCORING POSITION AND HOLDS
-                if(opmodeTimer.getElapsedTimeSeconds() > 27){
-                    setPathState(9);
-                }
                 if(follower.getPose().getX() > (pickup1Pose.getX() - 1) && follower.getPose().getY() > (pickup1Pose.getY() - 1)) {
                     if(actionTimer.getElapsedTimeSeconds() > 3) {
                         robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
@@ -196,9 +187,6 @@ public class ExampleBucketAuto extends OpMode {
             case 3:
 
                 //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES SAMPLE, GOES TO GRABBING SECOND SAMPLE POSITION AND HOLDS
-                if(opmodeTimer.getElapsedTimeSeconds() > 27){
-                    setPathState(9);
-                }
                 if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1))) {
                     if(actionTimer.getElapsedTimeSeconds() > 3){
                         robot.outtake.OpenOuttake(UniversalValues.OUTTAKE_OPEN);
@@ -222,9 +210,6 @@ public class ExampleBucketAuto extends OpMode {
             case 4:
 
                 //CHECKS IF ROBOT IS AT GRAB POSITION, GRABS SAMPLE, GOES TO SCORING POSITION AND HOLDS
-                if(opmodeTimer.getElapsedTimeSeconds() > 27){
-                    setPathState(9);
-                }
                 if(follower.getPose().getX() > (pickup2Pose.getX() - 1) && follower.getPose().getY() > (pickup2Pose.getY() - 1)) {
                     if(actionTimer.getElapsedTimeSeconds() > 3) {
                         robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
@@ -253,9 +238,6 @@ public class ExampleBucketAuto extends OpMode {
             case 5:
 
                 //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES SAMPLE, GOES TO GRABBING THIRD SAMPLE POSITION AND HOLDS
-                if(opmodeTimer.getElapsedTimeSeconds() > 27){
-                    setPathState(9);
-                }
                 if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1))) {
                     if(actionTimer.getElapsedTimeSeconds() > 3){
                         robot.outtake.OpenOuttake(UniversalValues.OUTTAKE_OPEN);
@@ -279,9 +261,6 @@ public class ExampleBucketAuto extends OpMode {
             case 6:
 
                 //CHECKS IF ROBOT IS AT GRAB POSITION, GRABS SAMPLE, GOES TO SCORING POSITION AND HOLDS
-                if(opmodeTimer.getElapsedTimeSeconds() > 27){
-                    setPathState(9);
-                }
                 if(follower.getPose().getX() > (pickup3Pose.getX() - 1) && follower.getPose().getY() > (pickup3Pose.getY() - 1)) {
                     if(actionTimer.getElapsedTimeSeconds() > 3) {
                         robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
@@ -310,9 +289,6 @@ public class ExampleBucketAuto extends OpMode {
             case 7:
 
                 //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES SAMPLE, GOES TO PARKING POSITION AND HOLDS
-                if(opmodeTimer.getElapsedTimeSeconds() > 27){
-                    setPathState(9);
-                }
                 if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1))) {
                     if(actionTimer.getElapsedTimeSeconds() > 3){
                         robot.outtake.OpenOuttake(UniversalValues.OUTTAKE_OPEN);
@@ -375,6 +351,10 @@ public class ExampleBucketAuto extends OpMode {
 
         // These loop the movements of the robot
         follower.update();
+        if(opmodeTimer.getElapsedTimeSeconds() > 27){
+            setPathState(9);
+            opmodeTimer.resetTimer();
+        }
         autonomousPathUpdate();
 
         // Feedback to Driver Hub
