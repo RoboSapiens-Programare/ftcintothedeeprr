@@ -13,6 +13,7 @@ public class Intake {
 
     public TouchSensor intakeLimit;
 
+
     public Intake(HardwareMap hardwareMap) {
         intake = hardwareMap.get(Servo.class, "intake");
 

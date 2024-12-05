@@ -51,16 +51,15 @@ public class ExampleBucketAuto extends OpMode {
      * Lets assume our robot is 18 by 18 inches
      * Lets assume the Robot is facing the human player and we want to score in the bucket */
     private final Pose startPose = new Pose(8,103, Math.toRadians(-90));
-    private final Pose scorePose = new Pose(20,123, Math.toRadians(315));
-    private final Pose score2Pose = new Pose(15,127, Math.toRadians(315));
+    private final Pose scorePose = new Pose(12,130, Math.toRadians(315));
     private final Pose pickup1Pose = new Pose(24, 120, Math.toRadians(0));
     private final Pose pickup2Pose = new Pose(24, 130, Math.toRadians(0));
     private final Pose pickup3Pose = new Pose(45, 96, Math.toRadians(90));
     private final Pose parkPose = new Pose(59,86, Math.toRadians(-90));
     private final Pose parkEmergencyPose = new Pose(14,29, Math.toRadians(-90));
+    private boolean isPressed = false;
 
-
-    private PathChain grabPickup1, grabPickup2, grabPickup3, scorePickup1, scorePickup2, scorePickup3, park, scorePreload, scoreSample;
+    private PathChain grabPickup1, grabPickup2, grabPickup3, scorePickup1, scorePickup2, scorePickup3, park, scorePreload;
     /** Build the paths for the auto (adds, for example, constant/linear headings while doing paths)
      * It is necessary to do this so that all the paths are built before the auto starts. **/
     public void buildPaths() {
@@ -73,10 +72,6 @@ public class ExampleBucketAuto extends OpMode {
             .setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading())
             .build();
 
-    scoreSample = follower.pathBuilder()
-            .addPath(new BezierLine(new Point(scorePose), new Point(score2Pose)))
-            .setLinearHeadingInterpolation(scorePose.getHeading(), score2Pose.getHeading())
-            .build();
 
         //grab pickup 1 path
     grabPickup1 = follower.pathBuilder()
@@ -129,131 +124,210 @@ public class ExampleBucketAuto extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
 
-            //GOES TO SCORE POSITION
             case 0:
+
+                //GOES TO SCORE POSITION
+                if(opmodeTimer.getElapsedTimeSeconds() > 27){
+                    setPathState(9);
+                }
+                robot.intake.setPivot(UniversalValues.INTAKE_INT);
+                robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND_MID,1);
                 follower.followPath(scorePreload, true);
-                pathTimer.resetTimer();
                 actionTimer.resetTimer();
-                actionTimer2.resetTimer();
                 setPathState(1);
                 break;
 
-            //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES PRELOAD, GOES TO GRABBING FIRST SAMPLE POSITION AND HOLDS
             case 1:
-                /* You could check for
-                - Follower State: "if(!follower.isBusy() {}" (Though, I don't recommend this because it might not return due to holdEnd
-                - Time: "if(pathTimer.getElapsedTimeSeconds() > 1) {}"
-                - Robot Position: "if(follower.getPose().getX() > 36) {}"
-                */
 
-                if(opmodeTimer.getElapsedTimeSeconds() > 25){
+                //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES PRELOAD, GOES TO GRABBING FIRST SAMPLE POSITION AND HOLDS
+                if(opmodeTimer.getElapsedTimeSeconds() > 27){
                     setPathState(9);
                 }
-                if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1)) || ((follower.getPose().getX() > (score2Pose.getX() - 1)) && follower.getPose().getY() > (score2Pose.getY()- 1))) {
-                    robot.intake.setPivot(UniversalValues.INTAKE_INT);
-                    robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND, 1);
-                    robot.outtake.setPivot(UniversalValues.OUTTAKE_DUMP);
-                        follower.followPath(scoreSample, true);
-                        if(actionTimer.getElapsedTimeSeconds() > 5){
-                            if(actionTimer2.getElapsedTimeSeconds() > 7){
+                if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1))) {
+                        if(actionTimer.getElapsedTimeSeconds() > 3){
                                 robot.outtake.OpenOuttake(UniversalValues.OUTTAKE_OPEN);
-                                if(actionTimer.getElapsedTimeSeconds() > 9) {
+                                if(actionTimer.getElapsedTimeSeconds() > 5) {
+                                    robot.outtake.ManualLevel(0, 1);
                                     robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT);
                                     robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
-                                    robot.outtake.ManualLevel(0, 1);
                                     actionTimer.resetTimer();
-                                    actionTimer2.resetTimer();
-                                    pathTimer.resetTimer();
                                     robot.intake.setPivot(UniversalValues.INTAKE_DOWN);
                                     follower.followPath(grabPickup1, /* holdEnd = */ true);
                                     setPathState(2);
                                 }
-                            }
+                        }
+                        else{
+                            robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND, 1);
+                            robot.outtake.setPivot(UniversalValues.OUTTAKE_DUMP);
                         }
                 }
                 break;
 
-            //CHECKS IF ROBOT IS AT GRAB POSITION, GRABS SAMPLE, GOES TO SCORING POSITION AND HOLDS
             case 2:
+
+                //CHECKS IF ROBOT IS AT GRAB POSITION, GRABS SAMPLE, GOES TO SCORING POSITION AND HOLDS
+                if(opmodeTimer.getElapsedTimeSeconds() > 27){
+                    setPathState(9);
+                }
                 if(follower.getPose().getX() > (pickup1Pose.getX() - 1) && follower.getPose().getY() > (pickup1Pose.getY() - 1)) {
-                    robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
-//                    robot.intake.ManualLevel(UniversalValues.INTAKE_EXTEND, 1);
                     if(actionTimer.getElapsedTimeSeconds() > 3) {
                         robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
-//                        robot.intake.ManualLevel(0,1);
+                        robot.intake.ManualLevel(0,1);
                         robot.intake.setPivot(UniversalValues.INTAKE_UP);
-                        if(actionTimer.getElapsedTimeSeconds() > 5){
+                        if(robot.intake.intakeLimit.isPressed() || isPressed){
+                            isPressed = true;
                             robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
-                            robot.intake.setPivot(UniversalValues.INTAKE_INT);
-                            follower.followPath(scorePickup1);
-                            actionTimer.resetTimer();
-                            actionTimer2.resetTimer();
-                            setPathState(3);
-
+                            if(actionTimer.getElapsedTimeSeconds() > 7) {
+                                robot.intake.setPivot(UniversalValues.INTAKE_INT);
+                                robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND_MID,1);
+                                follower.followPath(scorePickup1);
+                                actionTimer.resetTimer();
+                                setPathState(3);
+                                isPressed = false;
+                            }
                         }
+                    }
+                    else{
+                        robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
+                        robot.intake.ManualLevel(UniversalValues.INTAKE_EXTEND, 1);
                     }
                 }
                 break;
             case 3:
-            //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES SAMPLE, GOES TO GRABBING SECOND SAMPLE POSITION AND HOLDS
-                if(follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1)) {
-                    robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
-                    if(actionTimer.getElapsedTimeSeconds() > 5){
-                        robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
-                        follower.followPath(grabPickup2, /* holdEnd = */ true);
-                        actionTimer.resetTimer();
-                        setPathState(4);
-                    }
 
+                //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES SAMPLE, GOES TO GRABBING SECOND SAMPLE POSITION AND HOLDS
+                if(opmodeTimer.getElapsedTimeSeconds() > 27){
+                    setPathState(9);
+                }
+                if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1))) {
+                    if(actionTimer.getElapsedTimeSeconds() > 3){
+                        robot.outtake.OpenOuttake(UniversalValues.OUTTAKE_OPEN);
+                        if(actionTimer.getElapsedTimeSeconds() > 5) {
+                            robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT);
+                            robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
+                            robot.outtake.ManualLevel(0, 1);
+                            actionTimer.resetTimer();
+                            robot.intake.setPivot(UniversalValues.INTAKE_DOWN);
+                            follower.followPath(grabPickup2, /* holdEnd = */ true);
+                            setPathState(4);
+                        }
+                    }
+                    else{
+                        robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND, 1);
+                        robot.outtake.setPivot(UniversalValues.OUTTAKE_DUMP);
+                    }
                 }
                 break;
 
-            //CHECKS IF ROBOT IS AT GRAB POSITION, GRABS SAMPLE, GOES TO SCORING POSITION AND HOLDS
             case 4:
+
+                //CHECKS IF ROBOT IS AT GRAB POSITION, GRABS SAMPLE, GOES TO SCORING POSITION AND HOLDS
+                if(opmodeTimer.getElapsedTimeSeconds() > 27){
+                    setPathState(9);
+                }
                 if(follower.getPose().getX() > (pickup2Pose.getX() - 1) && follower.getPose().getY() > (pickup2Pose.getY() - 1)) {
-                    robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
-                    if(actionTimer.getElapsedTimeSeconds() > 5) {
-                        follower.followPath(scorePickup2, /* holdEnd = */ true);
-                        actionTimer.resetTimer();
-                        setPathState(5);
+                    if(actionTimer.getElapsedTimeSeconds() > 3) {
+                        robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
+                        robot.intake.ManualLevel(0,1);
+                        robot.intake.setPivot(UniversalValues.INTAKE_UP);
+                        if(robot.intake.intakeLimit.isPressed() || isPressed){
+                            isPressed = true;
+                            robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
+                            if(actionTimer.getElapsedTimeSeconds() > 7) {
+                                robot.intake.setPivot(UniversalValues.INTAKE_INT);
+                                robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND_MID,1);
+                                follower.followPath(scorePickup2);
+                                actionTimer.resetTimer();
+                                setPathState(5);
+                                isPressed = false;
+                            }
+                        }
+                    }
+                    else{
+                        robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
+                        robot.intake.ManualLevel(UniversalValues.INTAKE_EXTEND, 1);
                     }
                 }
                 break;
 
-            //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES SAMPLE, GOES TO GRABBING THIRD SAMPLE POSITION AND HOLDS
             case 5:
-                if(follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1)) {
-                    robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
-                    if(actionTimer.getElapsedTimeSeconds() > 5){
-                        robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
-                        follower.followPath(grabPickup3, /* holdEnd = */ true);
-                        actionTimer.resetTimer();
-                        setPathState(6);
+
+                //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES SAMPLE, GOES TO GRABBING THIRD SAMPLE POSITION AND HOLDS
+                if(opmodeTimer.getElapsedTimeSeconds() > 27){
+                    setPathState(9);
+                }
+                if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1))) {
+                    if(actionTimer.getElapsedTimeSeconds() > 3){
+                        robot.outtake.OpenOuttake(UniversalValues.OUTTAKE_OPEN);
+                        if(actionTimer.getElapsedTimeSeconds() > 5) {
+                            robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT);
+                            robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
+                            robot.outtake.ManualLevel(0, 1);
+                            actionTimer.resetTimer();
+                            robot.intake.setPivot(UniversalValues.INTAKE_DOWN);
+                            follower.followPath(grabPickup3, /* holdEnd = */ true);
+                            setPathState(6);
+                        }
+                    }
+                    else{
+                        robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND, 1);
+                        robot.outtake.setPivot(UniversalValues.OUTTAKE_DUMP);
                     }
                 }
                 break;
 
-            //CHECKS IF ROBOT IS AT GRAB POSITION, GRABS SAMPLE, GOES TO SCORING POSITION AND HOLDS
             case 6:
+
+                //CHECKS IF ROBOT IS AT GRAB POSITION, GRABS SAMPLE, GOES TO SCORING POSITION AND HOLDS
+                if(opmodeTimer.getElapsedTimeSeconds() > 27){
+                    setPathState(9);
+                }
                 if(follower.getPose().getX() > (pickup3Pose.getX() - 1) && follower.getPose().getY() > (pickup3Pose.getY() - 1)) {
-                    robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
-                    if(actionTimer.getElapsedTimeSeconds() > 5) {
-                        follower.followPath(scorePickup3, /* holdEnd = */ true);
-                        actionTimer.resetTimer();
-                        setPathState(7);
+                    if(actionTimer.getElapsedTimeSeconds() > 3) {
+                        robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
+                        robot.intake.ManualLevel(0,1);
+                        robot.intake.setPivot(UniversalValues.INTAKE_UP);
+                        if(robot.intake.intakeLimit.isPressed() || isPressed){
+                            isPressed = true;
+                            robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
+                            if(actionTimer.getElapsedTimeSeconds() > 7) {
+                                robot.intake.setPivot(UniversalValues.INTAKE_INT);
+                                robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND_MID,1);
+                                follower.followPath(scorePickup3);
+                                actionTimer.resetTimer();
+                                setPathState(7);
+                                isPressed = false;
+                            }
+                        }
+                    }
+                    else{
+                        robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
+                        robot.intake.ManualLevel(UniversalValues.INTAKE_EXTEND, 1);
                     }
                 }
                 break;
 
-            //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES SAMPLE, GOES TO PARKING POSITION AND HOLDS
             case 7:
-                if(follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1)) {
-                    robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
-                    if(actionTimer.getElapsedTimeSeconds() > 5){
-                        robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
-                        follower.followPath(park, /* holdEnd = */ true);
-                        actionTimer.resetTimer();
-                        setPathState(8);
+
+                //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES SAMPLE, GOES TO PARKING POSITION AND HOLDS
+                if(opmodeTimer.getElapsedTimeSeconds() > 27){
+                    setPathState(9);
+                }
+                if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1))) {
+                    if(actionTimer.getElapsedTimeSeconds() > 3){
+                        robot.outtake.OpenOuttake(UniversalValues.OUTTAKE_OPEN);
+                        if(actionTimer.getElapsedTimeSeconds() > 5) {
+                            robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT);
+                            robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
+                            robot.outtake.ManualLevel(0, 1);
+                            actionTimer.resetTimer();
+                            follower.followPath(park, /* holdEnd = */ true);
+                            setPathState(8);
+                        }
+                    }
+                    else{
+                        robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND, 1);
+                        robot.outtake.setPivot(UniversalValues.OUTTAKE_DUMP);
                     }
                 }
                 break;
@@ -261,6 +335,7 @@ public class ExampleBucketAuto extends OpMode {
             //CHECKS IF ROBOT IS AT PARKING POSITION, EXTEND SLIDES AT LEVEL 1 ASCENT POSITION
             case 8:
                 if(follower.getPose().getX() > (parkPose.getX() - 1) && follower.getPose().getY() > (parkPose.getY() - 1)) {
+                    robot.intake.setPivot(UniversalValues.INTAKE_INIT);
                     robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
                     setPathState(-1);
                 }
@@ -268,8 +343,15 @@ public class ExampleBucketAuto extends OpMode {
 
             //IF ANYTHING GOES WRONG THEN EMERGENCY PARK
             case 9:
+                robot.intake.ManualLevel(0,1);
+                robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
+                robot.intake.setClawPivot(UniversalValues.CLAW_HORIZONTAL);
+                robot.intake.setPivot(UniversalValues.INTAKE_INIT);
+                robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT);
+                robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
                 PathChain parkEmergency;
                 parkEmergency = follower.pathBuilder()
+                        .setZeroPowerAccelerationMultiplier(8)
                         .addPath(new BezierLine(new Point(follower.getPose()), new Point(parkEmergencyPose)))
                         .setLinearHeadingInterpolation(follower.getPose().getHeading(), parkEmergencyPose.getHeading())
                         .build();
@@ -326,7 +408,7 @@ public class ExampleBucketAuto extends OpMode {
         buildPaths();
 
 
-        // Set the claw to positions for init
+        // Set the subsystems to positions for init
         robot.intake.ManualLevel(0,1);
         robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
         robot.intake.setClawPivot(UniversalValues.CLAW_HORIZONTAL);
