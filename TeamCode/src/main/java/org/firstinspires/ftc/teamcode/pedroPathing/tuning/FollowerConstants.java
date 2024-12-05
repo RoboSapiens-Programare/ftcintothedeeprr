@@ -62,7 +62,7 @@ public class FollowerConstants {
             0);
 
     // Feed forward constant added on to the heading PIDF
-    public static double headingPIDFFeedForward = 0.01;
+    public static double headingPIDFFeedForward = 0;
 
 
     // Drive PIDF coefficients
@@ -74,7 +74,7 @@ public class FollowerConstants {
             0);
 
     // Feed forward constant added on to the drive PIDF
-    public static double drivePIDFFeedForward = 0.01;
+    public static double drivePIDFFeedForward = 0;
 
     // Kalman filter parameters for the drive error Kalman filter
     public static KalmanFilterParameters driveKalmanFilterParameters = new KalmanFilterParameters(
@@ -104,7 +104,7 @@ public class FollowerConstants {
     // Decreasing this will cause the deceleration at the end of the Path to be slower, making the
     // robot slower but reducing risk of end-of-path overshoots or localization slippage.
     // This can be set individually for each Path, but this is the default.
-    public static double zeroPowerAccelerationMultiplier = 4.5;
+    public static double zeroPowerAccelerationMultiplier = 3.5;
 
 
     // When the robot is at the end of its current Path or PathChain and the velocity goes below

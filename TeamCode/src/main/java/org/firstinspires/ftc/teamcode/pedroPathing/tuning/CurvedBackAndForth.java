@@ -72,6 +72,7 @@ public class CurvedBackAndForth extends OpMode {
         if (!follower.isBusy()) {
             if (forward) {
                 forward = false;
+
                 follower.followPath(backwards);
             } else {
                 forward = true;
