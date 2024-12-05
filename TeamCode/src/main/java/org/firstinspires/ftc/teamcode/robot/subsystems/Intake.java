@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 public class Intake {
-    public Servo pivotin, pivotIntake, intake;
+    public Servo pivotin, pivotin2, pivotIntake, intake;
 
     public DcMotorEx intakeMotor;
 
@@ -17,6 +17,7 @@ public class Intake {
         intake = hardwareMap.get(Servo.class, "intake");
 
         pivotin = hardwareMap.get(Servo.class, "pivotin");
+        pivotin2 = hardwareMap.get(Servo.class, "pivotin2");
         pivotIntake = hardwareMap.get(Servo.class, "pivotIntake");
 
         intakeMotor = hardwareMap.get(DcMotorEx.class, "intakeMotor");
@@ -24,6 +25,7 @@ public class Intake {
         intakeLimit = hardwareMap.get(TouchSensor.class, "intakeLimit");
 
         pivotin.setDirection(Servo.Direction.FORWARD);
+        pivotin2.setDirection(Servo.Direction.REVERSE);
         intakeMotor.setDirection(DcMotorEx.Direction.FORWARD);
         intakeMotor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         intakeMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -31,6 +33,7 @@ public class Intake {
 
     public void setPivot(double position) {
         pivotin.setPosition(position);
+        pivotin2.setPosition(position);
     }
 
     public void ManualLevel(int ManualTarget, double power) {
@@ -53,6 +56,7 @@ public class Intake {
 
     public void CloseIntake(double position) {
         intake.setPosition(position);
+
     }
 
     public void setClawPivot(double position){

@@ -1,9 +1,12 @@
 package org.firstinspires.ftc.teamcode.pedroPathing.examples;
 
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.*;
 import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierCurve;
@@ -29,7 +32,8 @@ import org.firstinspires.ftc.teamcode.robot.UniversalValues;
 public class ExampleBucketAuto extends OpMode {
     private Robot robot = null;
     private Follower follower;
-    private Timer pathTimer, actionTimer, opmodeTimer;
+    private Timer pathTimer, actionTimer, opmodeTimer, actionTimer2;
+    private Telemetry telemetryA;
 
     /** This is the variable where we store the state of our auto.
      * It is used by the pathUpdate method. */
@@ -48,21 +52,30 @@ public class ExampleBucketAuto extends OpMode {
      * Lets assume the Robot is facing the human player and we want to score in the bucket */
     private final Pose startPose = new Pose(8,103, Math.toRadians(-90));
     private final Pose scorePose = new Pose(20,123, Math.toRadians(315));
+    private final Pose score2Pose = new Pose(15,127, Math.toRadians(315));
     private final Pose pickup1Pose = new Pose(24, 120, Math.toRadians(0));
     private final Pose pickup2Pose = new Pose(24, 130, Math.toRadians(0));
-    private final Pose pickup3Pose = new Pose(45, 121, Math.toRadians(90));
-    private final Pose parkPose = new Pose(59,98, Math.toRadians(-90));
+    private final Pose pickup3Pose = new Pose(45, 96, Math.toRadians(90));
+    private final Pose parkPose = new Pose(59,86, Math.toRadians(-90));
     private final Pose parkEmergencyPose = new Pose(14,29, Math.toRadians(-90));
 
 
-    private PathChain grabPickup1, grabPickup2, grabPickup3, scorePickup1, scorePickup2, scorePickup3, park, scorePreload;
+    private PathChain grabPickup1, grabPickup2, grabPickup3, scorePickup1, scorePickup2, scorePickup3, park, scorePreload, scoreSample;
     /** Build the paths for the auto (adds, for example, constant/linear headings while doing paths)
      * It is necessary to do this so that all the paths are built before the auto starts. **/
     public void buildPaths() {
         //score preload path
+
+
+
     scorePreload = follower.pathBuilder()
             .addPath(new BezierLine(new Point(startPose), new Point(scorePose)))
             .setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading())
+            .build();
+
+    scoreSample = follower.pathBuilder()
+            .addPath(new BezierLine(new Point(scorePose), new Point(score2Pose)))
+            .setLinearHeadingInterpolation(scorePose.getHeading(), score2Pose.getHeading())
             .build();
 
         //grab pickup 1 path
@@ -119,6 +132,9 @@ public class ExampleBucketAuto extends OpMode {
             //GOES TO SCORE POSITION
             case 0:
                 follower.followPath(scorePreload, true);
+                pathTimer.resetTimer();
+                actionTimer.resetTimer();
+                actionTimer2.resetTimer();
                 setPathState(1);
                 break;
 
@@ -129,33 +145,56 @@ public class ExampleBucketAuto extends OpMode {
                 - Time: "if(pathTimer.getElapsedTimeSeconds() > 1) {}"
                 - Robot Position: "if(follower.getPose().getX() > 36) {}"
                 */
+
                 if(opmodeTimer.getElapsedTimeSeconds() > 25){
                     setPathState(9);
                 }
-                if(follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1)) {
-                    robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
-                    if(actionTimer.getElapsedTimeSeconds() > 5){
-                        robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
-                        follower.followPath(grabPickup1, /* holdEnd = */ true);
-                        actionTimer.resetTimer();
-                        setPathState(2);
-                    }
+                if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1)) || ((follower.getPose().getX() > (score2Pose.getX() - 1)) && follower.getPose().getY() > (score2Pose.getY()- 1))) {
+                    robot.intake.setPivot(UniversalValues.INTAKE_INT);
+                    robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND, 1);
+                    robot.outtake.setPivot(UniversalValues.OUTTAKE_DUMP);
+                        follower.followPath(scoreSample, true);
+                        if(actionTimer.getElapsedTimeSeconds() > 5){
+                            if(actionTimer2.getElapsedTimeSeconds() > 7){
+                                robot.outtake.OpenOuttake(UniversalValues.OUTTAKE_OPEN);
+                                if(actionTimer.getElapsedTimeSeconds() > 9) {
+                                    robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT);
+                                    robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
+                                    robot.outtake.ManualLevel(0, 1);
+                                    actionTimer.resetTimer();
+                                    actionTimer2.resetTimer();
+                                    pathTimer.resetTimer();
+                                    robot.intake.setPivot(UniversalValues.INTAKE_DOWN);
+                                    follower.followPath(grabPickup1, /* holdEnd = */ true);
+                                    setPathState(2);
+                                }
+                            }
+                        }
                 }
                 break;
 
             //CHECKS IF ROBOT IS AT GRAB POSITION, GRABS SAMPLE, GOES TO SCORING POSITION AND HOLDS
             case 2:
                 if(follower.getPose().getX() > (pickup1Pose.getX() - 1) && follower.getPose().getY() > (pickup1Pose.getY() - 1)) {
-                    robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
-                    if(actionTimer.getElapsedTimeSeconds() > 5) {
-                        follower.followPath(scorePickup1, /* holdEnd = */ true);
-                        actionTimer.resetTimer();
-                        setPathState(3);
+                    robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
+//                    robot.intake.ManualLevel(UniversalValues.INTAKE_EXTEND, 1);
+                    if(actionTimer.getElapsedTimeSeconds() > 3) {
+                        robot.intake.CloseIntake(UniversalValues.CLAW_CLOSE);
+//                        robot.intake.ManualLevel(0,1);
+                        robot.intake.setPivot(UniversalValues.INTAKE_UP);
+                        if(actionTimer.getElapsedTimeSeconds() > 5){
+                            robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
+                            robot.intake.setPivot(UniversalValues.INTAKE_INT);
+                            follower.followPath(scorePickup1);
+                            actionTimer.resetTimer();
+                            actionTimer2.resetTimer();
+                            setPathState(3);
+
+                        }
                     }
                 }
                 break;
             case 3:
-
             //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES SAMPLE, GOES TO GRABBING SECOND SAMPLE POSITION AND HOLDS
                 if(follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1)) {
                     robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
@@ -229,7 +268,6 @@ public class ExampleBucketAuto extends OpMode {
 
             //IF ANYTHING GOES WRONG THEN EMERGENCY PARK
             case 9:
-                follower.breakFollowing();
                 PathChain parkEmergency;
                 parkEmergency = follower.pathBuilder()
                         .addPath(new BezierLine(new Point(follower.getPose()), new Point(parkEmergencyPose)))
@@ -263,6 +301,8 @@ public class ExampleBucketAuto extends OpMode {
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
         telemetry.update();
+        telemetryA.update();
+        follower.telemetryDebug(telemetryA);
     }
 
     /** This method is called once at the init of the OpMode. **/
@@ -273,9 +313,15 @@ public class ExampleBucketAuto extends OpMode {
         actionTimer = new Timer();
         opmodeTimer = new Timer();
         opmodeTimer.resetTimer();
+        actionTimer2 = new Timer();
+        actionTimer2.resetTimer();
 
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
+
+        telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
+
+        telemetryA.update();
 
         buildPaths();
 
@@ -294,6 +340,7 @@ public class ExampleBucketAuto extends OpMode {
     public void init_loop() {
         opmodeTimer.resetTimer();
         actionTimer.resetTimer();
+        actionTimer2.resetTimer();
     }
 
     /** This method is called once at the start of the OpMode.
