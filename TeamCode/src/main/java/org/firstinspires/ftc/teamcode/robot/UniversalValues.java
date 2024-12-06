@@ -10,12 +10,12 @@ public class UniversalValues {
     public static double INTAKE_INIT = 0.75;
     public static double CLAW_OPEN = 0.2;
     public static double CLAW_CLOSE = 0.495;
-    public static double CLAW_VERTICAL = 0.5;
-    public static double CLAW_HORIZONTAL = 0.788;
+    public static double CLAW_VERTICAL = 0.4;
+    public static double CLAW_HORIZONTAL = 0.74;
 
     public static double OUTTAKE_DUMP = 0.9;
     public static double OUTTAKE_COLLECT = 0.4;
-    public static double OUTTAKE_OPEN = 0.61;
+    public static double OUTTAKE_OPEN = 0.68;
     public static double OUTTAKE_CLOSE = 0.3;
 
     public static double CLAW_TIMER = 1.8;
