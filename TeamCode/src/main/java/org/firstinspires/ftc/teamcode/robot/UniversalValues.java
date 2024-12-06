@@ -15,8 +15,8 @@ public class UniversalValues {
 
     public static double OUTTAKE_DUMP = 0.9;
     public static double OUTTAKE_COLLECT = 0.4;
-    public static double OUTTAKE_OPEN = 0.3;
-    public static double OUTTAKE_CLOSE = 0.61;
+    public static double OUTTAKE_OPEN = 0.61;
+    public static double OUTTAKE_CLOSE = 0.3;
 
     public static double CLAW_TIMER = 1.8;
     public static double PIVOT_TIMER = 0.0125;

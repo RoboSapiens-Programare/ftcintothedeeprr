@@ -33,7 +33,6 @@ public class ExampleBucketAuto extends OpMode {
     private Robot robot = null;
     private Follower follower;
     private Timer pathTimer, actionTimer, opmodeTimer, actionTimer2;
-    private Telemetry telemetryA;
 
     /** This is the variable where we store the state of our auto.
      * It is used by the pathUpdate method. */
@@ -51,7 +50,7 @@ public class ExampleBucketAuto extends OpMode {
      * Lets assume our robot is 18 by 18 inches
      * Lets assume the Robot is facing the human player and we want to score in the bucket */
     private final Pose startPose = new Pose(8,103, Math.toRadians(-90));
-    private final Pose scorePose = new Pose(12,130, Math.toRadians(315));
+    private final Pose scorePose = new Pose(11,129, Math.toRadians(315));
     private final Pose pickup1Pose = new Pose(24, 120, Math.toRadians(0));
     private final Pose pickup2Pose = new Pose(24, 130, Math.toRadians(0));
     private final Pose pickup3Pose = new Pose(45, 96, Math.toRadians(90));
@@ -68,7 +67,7 @@ public class ExampleBucketAuto extends OpMode {
 
 
     scorePreload = follower.pathBuilder()
-            .addPath(new BezierLine(new Point(startPose), new Point(scorePose)))
+            .addPath(new BezierCurve(new Point(startPose),new Point(28.935, 119.103, Point.CARTESIAN), new Point(scorePose)))
             .setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading())
             .build();
 
@@ -83,6 +82,8 @@ public class ExampleBucketAuto extends OpMode {
     scorePickup1 = follower.pathBuilder()
             .addPath(new BezierLine(new Point(pickup1Pose), new Point(scorePose)))
             .setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading())
+
+
             .build();
 
         //grab pickup 2 path
@@ -128,8 +129,7 @@ public class ExampleBucketAuto extends OpMode {
 
                 //GOES TO SCORE POSITION
                 robot.intake.setPivot(UniversalValues.INTAKE_INT);
-                robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND_MID,1);
-                follower.followPath(scorePreload, true);
+                follower.followPath(scorePreload,true);
                 actionTimer.resetTimer();
                 setPathState(1);
                 break;
@@ -138,22 +138,26 @@ public class ExampleBucketAuto extends OpMode {
 
                 //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES PRELOAD, GOES TO GRABBING FIRST SAMPLE POSITION AND HOLDS
                 if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1))) {
-                        if(actionTimer.getElapsedTimeSeconds() > 3){
+                    if (actionTimer.getElapsedTimeSeconds() > 2) {
+                        robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND, 1);
+                        if (robot.outtake.outtakeMotor.getCurrentPosition() > UniversalValues.OUTTAKE_EXTEND - 100) {
+                            robot.outtake.setPivot(UniversalValues.OUTTAKE_DUMP);
+                            if (actionTimer.getElapsedTimeSeconds() > 4) {
                                 robot.outtake.OpenOuttake(UniversalValues.OUTTAKE_OPEN);
-                                if(actionTimer.getElapsedTimeSeconds() > 5) {
-                                    robot.outtake.ManualLevel(0, 1);
+                                if(actionTimer.getElapsedTimeSeconds() > 5){
                                     robot.outtake.setPivot(UniversalValues.OUTTAKE_COLLECT);
-                                    robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
+                                }
+                                if (actionTimer.getElapsedTimeSeconds() > 7) {
+                                    robot.outtake.ManualLevel(0, 1);
+                                    robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_OPEN);
                                     actionTimer.resetTimer();
                                     robot.intake.setPivot(UniversalValues.INTAKE_DOWN);
                                     follower.followPath(grabPickup1, /* holdEnd = */ true);
                                     setPathState(2);
                                 }
+                            }
                         }
-                        else{
-                            robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND, 1);
-                            robot.outtake.setPivot(UniversalValues.OUTTAKE_DUMP);
-                        }
+                    }
                 }
                 break;
 
@@ -171,7 +175,8 @@ public class ExampleBucketAuto extends OpMode {
                             if(actionTimer.getElapsedTimeSeconds() > 7) {
                                 robot.intake.setPivot(UniversalValues.INTAKE_INT);
                                 robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND_MID,1);
-                                follower.followPath(scorePickup1);
+                                robot.outtake.CloseOuttake(UniversalValues.OUTTAKE_CLOSE);
+                                follower.followPath(scorePickup1,true);
                                 actionTimer.resetTimer();
                                 setPathState(3);
                                 isPressed = false;
@@ -221,7 +226,7 @@ public class ExampleBucketAuto extends OpMode {
                             if(actionTimer.getElapsedTimeSeconds() > 7) {
                                 robot.intake.setPivot(UniversalValues.INTAKE_INT);
                                 robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND_MID,1);
-                                follower.followPath(scorePickup2);
+                                follower.followPath(scorePickup2,true);
                                 actionTimer.resetTimer();
                                 setPathState(5);
                                 isPressed = false;
@@ -272,7 +277,7 @@ public class ExampleBucketAuto extends OpMode {
                             if(actionTimer.getElapsedTimeSeconds() > 7) {
                                 robot.intake.setPivot(UniversalValues.INTAKE_INT);
                                 robot.outtake.ManualLevel(UniversalValues.OUTTAKE_EXTEND_MID,1);
-                                follower.followPath(scorePickup3);
+                                follower.followPath(scorePickup3,true);
                                 actionTimer.resetTimer();
                                 setPathState(7);
                                 isPressed = false;
@@ -351,10 +356,6 @@ public class ExampleBucketAuto extends OpMode {
 
         // These loop the movements of the robot
         follower.update();
-        if(opmodeTimer.getElapsedTimeSeconds() > 27){
-            setPathState(9);
-            opmodeTimer.resetTimer();
-        }
         autonomousPathUpdate();
 
         // Feedback to Driver Hub
@@ -363,8 +364,6 @@ public class ExampleBucketAuto extends OpMode {
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
         telemetry.update();
-        telemetryA.update();
-        follower.telemetryDebug(telemetryA);
     }
 
     /** This method is called once at the init of the OpMode. **/
@@ -381,9 +380,8 @@ public class ExampleBucketAuto extends OpMode {
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
 
-        telemetryA = new MultipleTelemetry(this.telemetry, FtcDashboard.getInstance().getTelemetry());
 
-        telemetryA.update();
+        telemetry.update();
 
         buildPaths();
 

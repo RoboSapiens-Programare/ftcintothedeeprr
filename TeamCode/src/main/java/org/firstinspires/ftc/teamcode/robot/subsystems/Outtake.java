@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Outtake {
     public Servo pivotOut1, pivotOut2, outtake;
-    public DistanceSensor outtakeSensor;
+//    public DistanceSensor outtakeSensor;
     public DcMotorEx outtakeMotor;
 
     public Outtake(HardwareMap hardwareMap){
@@ -20,7 +20,7 @@ public class Outtake {
 
         outtakeMotor = hardwareMap.get(DcMotorEx.class, "outtakeMotor");
 
-        outtakeSensor = hardwareMap.get(DistanceSensor.class, "outtakeSensor");
+//        outtakeSensor = hardwareMap.get(DistanceSensor.class, "outtakeSensor");
 
         outtakeMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         outtakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);

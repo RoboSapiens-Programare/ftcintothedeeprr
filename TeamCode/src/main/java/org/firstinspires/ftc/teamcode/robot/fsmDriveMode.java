@@ -59,7 +59,7 @@ public class fsmDriveMode extends OpMode {
     public void loop(){
         //telemetry.addData("Claw Pivot", clawPivot);
         telemetry.update();
-        telemetry.addData("cm: ", robot.outtake.outtakeSensor.getDistance(DistanceUnit.CM));
+//       telemetry.addData("cm: ", robot.outtake.outtakeSensor.getDistance(DistanceUnit.CM));
         switch(intakeState){
             case INTAKE_START:
                 isPressed = false;
@@ -152,7 +152,7 @@ public class fsmDriveMode extends OpMode {
                 if(isPressed) {
                     robot.intake.setPivot(UniversalValues.INTAKE_UP);
 
-                    if (robot.outtake.outtakeSensor.getDistance(DistanceUnit.CM) < 14 && robot.outtake.outtakeSensor.getDistance(DistanceUnit.CM) != 0 && robot.outtake.outtakeSensor.getDistance(DistanceUnit.CM) != 819) {
+                    if (intakeTimer.seconds()>UniversalValues.CLAW_TIMER) {
                         robot.intake.OpenIntake(UniversalValues.CLAW_OPEN);
                         intakeTimer.reset();
                         intakeState = IntakeState.INTAKE_START;

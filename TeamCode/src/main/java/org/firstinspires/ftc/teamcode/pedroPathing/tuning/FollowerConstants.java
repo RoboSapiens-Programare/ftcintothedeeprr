@@ -38,9 +38,9 @@ public class FollowerConstants {
 
     // Translational PIDF coefficients (don't use integral)
     public static CustomPIDFCoefficients translationalPIDFCoefficients = new CustomPIDFCoefficients(
-            0.14,
+            0.4,
             0,
-            0.035,
+            0.02,
             0);
 
     // Translational Integral
@@ -56,9 +56,9 @@ public class FollowerConstants {
 
     // Heading error PIDF coefficients
     public static CustomPIDFCoefficients headingPIDFCoefficients = new CustomPIDFCoefficients(
-            0.8,
+            4,
             0,
-            0,
+            0.17,
             0);
 
     // Feed forward constant added on to the heading PIDF
@@ -67,9 +67,9 @@ public class FollowerConstants {
 
     // Drive PIDF coefficients
     public static CustomFilteredPIDFCoefficients drivePIDFCoefficients = new CustomFilteredPIDFCoefficients(
-            0.0125,
+            0.01,
             0,
-            0.00001,
+            0.0002,
             0.6,
             0);
 
@@ -86,7 +86,7 @@ public class FollowerConstants {
     public static double mass = 10;
 
     // Centripetal force to power scaling
-    public static double centripetalScaling = 0.0007;
+    public static double centripetalScaling = 0.0005;
 
 
     // Acceleration of the drivetrain when power is cut in inches/second^2 (should be negative)
@@ -104,7 +104,7 @@ public class FollowerConstants {
     // Decreasing this will cause the deceleration at the end of the Path to be slower, making the
     // robot slower but reducing risk of end-of-path overshoots or localization slippage.
     // This can be set individually for each Path, but this is the default.
-    public static double zeroPowerAccelerationMultiplier = 3.5;
+    public static double zeroPowerAccelerationMultiplier = 2.7;
 
 
     // When the robot is at the end of its current Path or PathChain and the velocity goes below
@@ -161,7 +161,7 @@ public class FollowerConstants {
 
     // the limit at which the translational PIDF switches between the main and secondary translational PIDFs,
     // if the secondary PID is active
-    public static double translationalPIDFSwitch = 3;
+    public static double translationalPIDFSwitch = 0;
 
     // Secondary translational PIDF coefficients (don't use integral)
     public static CustomPIDFCoefficients secondaryTranslationalPIDFCoefficients = new CustomPIDFCoefficients(
@@ -207,5 +207,5 @@ public class FollowerConstants {
             0);
 
     // Feed forward constant added on to the secondary drive PIDF
-    public static double secondaryDrivePIDFFeedForward = 0.01;
+    public static double secondaryDrivePIDFFeedForward = 0;
 }
