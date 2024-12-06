@@ -1,11 +1,10 @@
-package org.firstinspires.ftc.teamcode.robot.subsystems.drive.pedroPathing.examples;
+package org.firstinspires.ftc.teamcode.robot.auto;
 
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pedroPathing.follower.Follower;
-import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pedroPathing.follower.*;
 import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pedroPathing.pathGeneration.BezierCurve;
 import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pedroPathing.pathGeneration.BezierLine;
