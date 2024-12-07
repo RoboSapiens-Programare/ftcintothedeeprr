@@ -59,4 +59,5 @@ dependencies {
     implementation "dev.frozenmilk.dairy:Core:2.0.0"
     implementation "dev.frozenmilk.dairy:Util:1.0.2"
     implementation "dev.frozenmilk.sinister:Sloth:0.0.1"
+    implementation "dev.frozenmilk.sinister.sloth:DashFix:0.0.0"
 }
