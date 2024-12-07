@@ -17,157 +17,168 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.universalValues;
 
 @Autonomous(name = "Auto Bucket", group = "Autonomous")
 public class BucketAuto extends OpMode {
-    private org.firstinspires.ftc.teamcode.robot.subsystems.robot robot = null;
-    private Follower follower;
-    private Timer pathTimer, actionTimer, opmodeTimer, actionTimer2;
-    private boolean singleton = true;
-    private boolean singleton2 = true;
+private org.firstinspires.ftc.teamcode.robot.subsystems.robot robot = null;
+private Follower follower;
+private Timer pathTimer, actionTimer, opmodeTimer, actionTimer2;
+private boolean singleton = true;
+private boolean singleton2 = true;
 
-    /** This is the variable where we store the state of our auto.
-     * It is used by the pathUpdate method. */
-    private int pathState;
+/** This is the variable where we store the state of our auto.
+ * It is used by the pathUpdate method. */
+private int pathState;
 
-    /** This is our claw subsystem.
-     * We call its methods to manipulate the servos that it has within the subsystem. */
+/** Create and Define Poses + Paths
+ * Poses are built with three constructors: x, y, and heading (in Radians).
+ * Pedro uses 0 - 144 for x and y, with 0, 0 being on the bottom left.
+ * (For Into the Deep, this would be Blue Observation Zone (0,0) to Red Observation Zone (144,144).)
+ * Even though Pedro uses a different coordinate system than RR, you can convert any roadrunner pose by adding +72 both the x and y.
+ * This visualizer is very easy to use to find and create paths/pathchains/poses: <https://pedro-path-generator.vercel.app/> */
 
-    /** Create and Define Poses + Paths
-     * Poses are built with three constructors: x, y, and heading (in Radians).
-     * Pedro uses 0 - 144 for x and y, with 0, 0 being on the bottom left.
-     * (For Into the Deep, this would be Blue Observation Zone (0,0) to Red Observation Zone (144,144).)
-     * Even though Pedro uses a different coordinate system than RR, you can convert any roadrunner pose by adding +72 both the x and y.
-     * This visualizer is very easy to use to find and create paths/pathchains/poses: <https://pedro-path-generator.vercel.app/> */
-    private final Pose startPose = new Pose(8,103, Math.toRadians(-90));
-    private final Pose scorePose = new Pose(6,130, Math.toRadians(315));
-    private final Pose pickup1Pose = new Pose(10, 125, Math.toRadians(0));
-    private final Pose pickup2Pose = new Pose(10, 117, Math.toRadians(0));
-    private final Pose pickup3Pose = new Pose(18, 120, Math.toRadians(39));
-    private final Pose parkPose = new Pose(59,100, Math.toRadians(90));
-    private final Pose parkEmergencyPose = new Pose(14,29, Math.toRadians(-90));
-    private boolean isPressed = false;
+//TODO : update paths with correct poses and/or bezier curves
 
-    private PathChain grabPickup1, grabPickup2, grabPickup3, scorePickup1, scorePickup2, scorePickup3, park, scorePreload;
-    /** Build the paths for the auto (adds, for example, constant/linear headings while doing paths)
-     * It is necessary to do this so that all the paths are built before the auto starts. **/
-    public void buildPaths() {
-        //score preload path
+private final Pose startPose = new Pose(8,103, Math.toRadians(-90));
+private final Pose scorePose = new Pose(6,130, Math.toRadians(315));
+private final Pose pickup1Pose = new Pose(10, 125, Math.toRadians(0));
+private final Pose pickup2Pose = new Pose(10, 117, Math.toRadians(0));
+private final Pose pickup3Pose = new Pose(18, 120, Math.toRadians(39));
+private final Pose parkPose = new Pose(59,100, Math.toRadians(90));
+private final Pose parkEmergencyPose = new Pose(14,29, Math.toRadians(-90));
+private boolean isPressed = false;
 
+private PathChain grabPickup1, grabPickup2, grabPickup3, scorePickup1, scorePickup2, scorePickup3, park, scorePreload;
 
+/** Build the paths for the auto (adds, for example, constant/linear headings while doing paths)
+ * It is necessary to do this so that all the paths are built before the auto starts. **/
 
-    scorePreload = follower.pathBuilder()
-            .addPath(new BezierCurve(new Point(startPose),new Point(28.935, 119.103, Point.CARTESIAN), new Point(scorePose)))
-            .setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading())
-            .build();
-
-
-        //grab pickup 1 path
-    grabPickup1 = follower.pathBuilder()
-            .addPath(new BezierLine(new Point(scorePose), new Point(pickup1Pose)))
-            .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
-            .build();
-
-        //score pickup 1 path
-    scorePickup1 = follower.pathBuilder()
-            .addPath(new BezierLine(new Point(pickup1Pose), new Point(scorePose)))
-            .setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading())
-
-
-            .build();
-
-        //grab pickup 2 path
-    grabPickup2 = follower.pathBuilder()
-            .addPath(new BezierLine(new Point(scorePose), new Point(pickup2Pose)))
-            .setLinearHeadingInterpolation(scorePose.getHeading(), pickup2Pose.getHeading())
-            .build();
-
-        //score pickup 2 path
-    scorePickup2 = follower.pathBuilder()
-            .addPath(new BezierLine(new Point(pickup2Pose), new Point(scorePose)))
-            .setLinearHeadingInterpolation(pickup2Pose.getHeading(), scorePose.getHeading())
-            .build();
-
-        //grab pickup 3 path
-    grabPickup3 = follower.pathBuilder()
-            .addPath(new BezierLine(new Point(scorePose), new Point(pickup3Pose)))
-            .setLinearHeadingInterpolation(scorePose.getHeading(), pickup3Pose.getHeading())
-            .build();
-
-        //score pickup 3 path
-    scorePickup3 = follower.pathBuilder()
-            .addPath(new BezierLine(new Point(pickup3Pose), new Point(scorePose)))
-            .setLinearHeadingInterpolation(pickup3Pose.getHeading(), scorePose.getHeading())
-            .build();
-
-        //park path
-    park = follower.pathBuilder()
-            .addPath(new BezierLine(new Point(scorePose), new Point(parkPose)))
-            .setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading())
-            .build();
-    }
+public void buildPaths() {
+    //score preload path
 
 
 
-    /** This switch is called continuously and runs the pathing, at certain points, it triggers the action state.
-     * Everytime the switch changes case, it will reset the timer. (This is because of the setPathState() method)
-     * The followPath() function sets the follower to run the specific path, but does NOT wait for it to finish before moving on. */
-    public void autonomousPathUpdate() {
-        switch (pathState) {
+scorePreload = follower.pathBuilder()
+        .addPath(new BezierCurve(new Point(startPose),new Point(28.935, 119.103, Point.CARTESIAN), new Point(scorePose)))
+        .setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading())
+        .build();
 
-            case 0:
 
-                //GOES TO SCORE POSITION
-                robot.intake.setPivot(universalValues.INTAKE_INT);
-                follower.followPath(scorePreload,true);
-                actionTimer.resetTimer();
-                setPathState(1);
-                break;
+    //grab pickup 1 path
+grabPickup1 = follower.pathBuilder()
+        .addPath(new BezierLine(new Point(scorePose), new Point(pickup1Pose)))
+        .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
+        .build();
 
-            case 1:
+    //score pickup 1 path
+scorePickup1 = follower.pathBuilder()
+        .addPath(new BezierLine(new Point(pickup1Pose), new Point(scorePose)))
+        .setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading())
 
-                //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES PRELOAD, GOES TO GRABBING FIRST SAMPLE POSITION AND HOLDS
-                if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1))) {
-                    if (actionTimer.getElapsedTimeSeconds() > 3) {
-                            robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 1);
-                        if (robot.outtake.outtakeMotor.getCurrentPosition() > universalValues.OUTTAKE_EXTEND - 50) {
-                            if (singleton)
-                            {
-                                robot.outtake.setPivot(universalValues.OUTTAKE_DUMP);
-                                singleton = false;
-                            }
 
-                            if (actionTimer.getElapsedTimeSeconds() > 5) {
-                                robot.outtake.OpenOuttake(universalValues.OUTTAKE_OPEN);
-                                if(actionTimer.getElapsedTimeSeconds() > 6){
-                                    if (singleton2) {
-                                        robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
-                                        singleton2 = false;
-                                    }
+        .build();
+
+    //grab pickup 2 path
+grabPickup2 = follower.pathBuilder()
+        .addPath(new BezierLine(new Point(scorePose), new Point(pickup2Pose)))
+        .setLinearHeadingInterpolation(scorePose.getHeading(), pickup2Pose.getHeading())
+        .build();
+
+    //score pickup 2 path
+scorePickup2 = follower.pathBuilder()
+        .addPath(new BezierLine(new Point(pickup2Pose), new Point(scorePose)))
+        .setLinearHeadingInterpolation(pickup2Pose.getHeading(), scorePose.getHeading())
+        .build();
+
+    //grab pickup 3 path
+grabPickup3 = follower.pathBuilder()
+        .addPath(new BezierLine(new Point(scorePose), new Point(pickup3Pose)))
+        .setLinearHeadingInterpolation(scorePose.getHeading(), pickup3Pose.getHeading())
+        .build();
+
+    //score pickup 3 path
+scorePickup3 = follower.pathBuilder()
+        .addPath(new BezierLine(new Point(pickup3Pose), new Point(scorePose)))
+        .setLinearHeadingInterpolation(pickup3Pose.getHeading(), scorePose.getHeading())
+        .build();
+
+    //park path
+park = follower.pathBuilder()
+        .addPath(new BezierLine(new Point(scorePose), new Point(parkPose)))
+        .setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading())
+        .build();
+}
+
+
+
+/** This switch is called continuously and runs the pathing, at certain points, it triggers the action state.
+ * Everytime the switch changes case, it will reset the timer. (This is because of the setPathState() method)
+ * The followPath() function sets the follower to run the specific path, but does NOT wait for it to finish before moving on. */
+public void autonomousPathUpdate() {
+
+    //TODO : fix useless repeating instructions and ispressed boolean logic
+
+    switch (pathState) {
+
+        case 0:
+
+            //GOES TO SCORE POSITION
+            robot.intake.setPivot(universalValues.INTAKE_INT);
+            follower.followPath(scorePreload,true);
+            actionTimer.resetTimer();
+            setPathState(1);
+            break;
+
+        case 1:
+
+            //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES PRELOAD, GOES TO GRABBING FIRST SAMPLE POSITION AND HOLDS
+            if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1))) {
+                if (actionTimer.getElapsedTimeSeconds() > 3) {
+                        robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 1);
+                    if (robot.outtake.outtakeMotor.getCurrentPosition() > universalValues.OUTTAKE_EXTEND - 50) {
+
+                        if (singleton)
+                        {
+                            robot.outtake.setPivot(universalValues.OUTTAKE_DUMP);
+                            singleton = false;
+                        }
+
+                        if (actionTimer.getElapsedTimeSeconds() > 5) {
+
+                            robot.outtake.OpenOuttake(universalValues.OUTTAKE_OPEN);
+
+                            if(actionTimer.getElapsedTimeSeconds() > 6){
+
+                                if (singleton2) {
+                                    robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
+                                    singleton2 = false;
                                 }
+
                                 if (actionTimer.getElapsedTimeSeconds() > 7) {
-                                    robot.outtake.ManualLevel(0, 0.75);
-                                    robot.outtake.CloseOuttake(universalValues.OUTTAKE_OPEN);
-                                    actionTimer.resetTimer();
-                                    robot.intake.setPivot(universalValues.INTAKE_DOWN);
-                                    follower.followPath(grabPickup1, /* holdEnd = */ true);
-                                    singleton2 = true;
-                                    singleton = true;
-                                    setPathState(2);
+                                        robot.outtake.ManualLevel(0, 0.75);
+                                        robot.outtake.OpenOuttake(universalValues.OUTTAKE_OPEN);
+                                        robot.intake.setPivot(universalValues.INTAKE_DOWN);
+                                        follower.followPath(grabPickup1, /* holdEnd = */ true);
+                                        actionTimer.resetTimer();
+                                        singleton2 = true;
+                                        singleton = true;
+                                        setPathState(2);
                                 }
                             }
                         }
                     }
                 }
-                break;
+            }
+            break;
 
-            case 2:
+        case 2:
 
-                //CHECKS IF ROBOT IS AT GRAB POSITION, GRABS SAMPLE, GOES TO SCORING POSITION AND HOLDS
-                if(follower.getPose().getX() > (pickup1Pose.getX() - 1) && follower.getPose().getY() > (pickup1Pose.getY() - 1)) {
-                    if(actionTimer.getElapsedTimeSeconds() > 5) {
-                        if (singleton) {
-                            robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
-                            singleton = false;
-                        }
+            //CHECKS IF ROBOT IS AT GRAB POSITION, GRABS SAMPLE, GOES TO SCORING POSITION AND HOLDS
+            if(follower.getPose().getX() > (pickup1Pose.getX() - 1) && follower.getPose().getY() > (pickup1Pose.getY() - 1)) {
+                if(actionTimer.getElapsedTimeSeconds() > 5) {
+
+                    if (singleton) {
+                        robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
+                        singleton = false;
                     }
+
                     if(actionTimer.getElapsedTimeSeconds() > 7) {
                         robot.intake.ManualLevel(0, 1);
                         robot.intake.setPivot(universalValues.INTAKE_UP);
@@ -178,13 +189,19 @@ public class BucketAuto extends OpMode {
                                 singleton2 = false;
                             }
                             if (actionTimer.getElapsedTimeSeconds() > 9) {
+
                                 robot.intake.setPivot(universalValues.INTAKE_INT);
-                                robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 1);
                                 robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
-                                follower.followPath(scorePickup1, true);
-                                actionTimer.resetTimer();
+
                                 robot.intake.ManualLevel(0, 1);
+                                robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 1);
+
+                                follower.followPath(scorePickup1, true);
+
+                                actionTimer.resetTimer();
+
                                 isPressed = false;
+
                                 singleton2 = true;
                                 singleton = true;
                                 setPathState(3);
@@ -192,61 +209,65 @@ public class BucketAuto extends OpMode {
                         }
                     }
 
-                    else{
-                        robot.intake.ManualLevel(universalValues.INTAKE_EXTEND, 1);
-                        if (singleton2 && singleton){
-                            robot.intake.OpenIntake(universalValues.CLAW_OPEN);
+                }
+                else if(singleton2 && singleton){
+
+                    robot.intake.OpenIntake(universalValues.CLAW_OPEN);
+                    robot.intake.ManualLevel(universalValues.INTAKE_EXTEND, 1);
+
+                }
+
+            }
+            break;
+        case 3:
+
+            //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES SAMPLE, GOES TO GRABBING SECOND SAMPLE POSITION AND HOLDS
+            if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1))) {
+                if (actionTimer.getElapsedTimeSeconds() > 3) {
+                    robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 1);
+                    if (robot.outtake.outtakeMotor.getCurrentPosition() > universalValues.OUTTAKE_EXTEND - 50) {
+                        if (singleton)
+                        {
+                            robot.outtake.setPivot(universalValues.OUTTAKE_DUMP);
+                            singleton = false;
                         }
 
-                    }
-                }
-                break;
-            case 3:
-
-                //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES SAMPLE, GOES TO GRABBING SECOND SAMPLE POSITION AND HOLDS
-                if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1))) {
-                    if (actionTimer.getElapsedTimeSeconds() > 3) {
-                        robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 1);
-                        if (robot.outtake.outtakeMotor.getCurrentPosition() > universalValues.OUTTAKE_EXTEND - 50) {
-                            if (singleton)
-                            {
-                                robot.outtake.setPivot(universalValues.OUTTAKE_DUMP);
-                                singleton = false;
-                            }
-
-                            if (actionTimer.getElapsedTimeSeconds() > 5) {
-                                robot.outtake.OpenOuttake(universalValues.OUTTAKE_OPEN);
-                                if(actionTimer.getElapsedTimeSeconds() > 6){
-                                    if (singleton2) {
-                                        robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
-                                        singleton2 = false;
-                                    }
+                        if (actionTimer.getElapsedTimeSeconds() > 5) {
+                            robot.outtake.OpenOuttake(universalValues.OUTTAKE_OPEN);
+                            if(actionTimer.getElapsedTimeSeconds() > 6){
+                                if (singleton2) {
+                                    robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
+                                    singleton2 = false;
                                 }
+
                                 if (actionTimer.getElapsedTimeSeconds() > 7) {
                                     robot.outtake.ManualLevel(0, 0.75);
-                                    robot.outtake.CloseOuttake(universalValues.OUTTAKE_OPEN);
-                                    actionTimer.resetTimer();
+
+                                    robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
                                     robot.intake.setPivot(universalValues.INTAKE_DOWN);
+
                                     follower.followPath(grabPickup2, /* holdEnd = */ true);
+                                    actionTimer.resetTimer();
                                     singleton2 = true;
                                     singleton = true;
                                     setPathState(4);
                                 }
                             }
+
                         }
                     }
                 }
-                break;
+            }
+            break;
 
-            case 4:
+        case 4:
 
-                //CHECKS IF ROBOT IS AT GRAB POSITION, GRABS SAMPLE, GOES TO SCORING POSITION AND HOLDS
-                if(follower.getPose().getX() > (pickup1Pose.getX() - 1) && follower.getPose().getY() > (pickup1Pose.getY() - 1)) {
-                    if(actionTimer.getElapsedTimeSeconds() > 5) {
-                        if (singleton) {
-                            robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
-                            singleton = false;
-                        }
+            //CHECKS IF ROBOT IS AT GRAB POSITION, GRABS SAMPLE, GOES TO SCORING POSITION AND HOLDS
+            if(follower.getPose().getX() > (pickup1Pose.getX() - 1) && follower.getPose().getY() > (pickup1Pose.getY() - 1)) {
+                if(actionTimer.getElapsedTimeSeconds() > 5) {
+                    if (singleton) {
+                        robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
+                        singleton = false;
                     }
                     if(actionTimer.getElapsedTimeSeconds() > 7) {
                         robot.intake.ManualLevel(0, 1);
@@ -259,11 +280,14 @@ public class BucketAuto extends OpMode {
                             }
                             if (actionTimer.getElapsedTimeSeconds() > 9) {
                                 robot.intake.setPivot(universalValues.INTAKE_INT);
-                                robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 1);
                                 robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
-                                follower.followPath(scorePickup2, true);
-                                actionTimer.resetTimer();
+
+                                robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 1);
                                 robot.intake.ManualLevel(0, 1);
+
+                                follower.followPath(scorePickup2, true);
+
+                                actionTimer.resetTimer();
                                 isPressed = false;
                                 singleton2 = true;
                                 singleton = true;
@@ -271,63 +295,69 @@ public class BucketAuto extends OpMode {
                             }
                         }
                     }
+                }
 
-                    else{
+                else{
+
+                    if (singleton2 && singleton){
                         robot.intake.ManualLevel(universalValues.INTAKE_EXTEND, 1);
-                        if (singleton2 && singleton){
-                            robot.intake.OpenIntake(universalValues.CLAW_OPEN);
+                        robot.intake.OpenIntake(universalValues.CLAW_OPEN);
+                    }
+
+                }
+            }
+            break;
+
+        case 5:
+
+            //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES SAMPLE, GOES TO GRABBING THIRD SAMPLE POSITION AND HOLDS
+            if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1))) {
+                if (actionTimer.getElapsedTimeSeconds() > 3) {
+                    robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 1);
+                    if (robot.outtake.outtakeMotor.getCurrentPosition() > universalValues.OUTTAKE_EXTEND - 50) {
+                        if (singleton)
+                        {
+                            robot.outtake.setPivot(universalValues.OUTTAKE_DUMP);
+                            singleton = false;
                         }
 
-                    }
-                }
-                break;
-
-            case 5:
-
-                //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES SAMPLE, GOES TO GRABBING THIRD SAMPLE POSITION AND HOLDS
-                if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1))) {
-                    if (actionTimer.getElapsedTimeSeconds() > 3) {
-                        robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 1);
-                        if (robot.outtake.outtakeMotor.getCurrentPosition() > universalValues.OUTTAKE_EXTEND - 50) {
-                            if (singleton)
-                            {
-                                robot.outtake.setPivot(universalValues.OUTTAKE_DUMP);
-                                singleton = false;
-                            }
-
-                            if (actionTimer.getElapsedTimeSeconds() > 5) {
-                                robot.outtake.OpenOuttake(universalValues.OUTTAKE_OPEN);
-                                if(actionTimer.getElapsedTimeSeconds() > 6){
-                                    if (singleton2) {
-                                        robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
-                                        singleton2 = false;
-                                    }
+                        if (actionTimer.getElapsedTimeSeconds() > 5) {
+                            robot.outtake.OpenOuttake(universalValues.OUTTAKE_OPEN);
+                            if(actionTimer.getElapsedTimeSeconds() > 6){
+                                if (singleton2) {
+                                    robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
+                                    singleton2 = false;
                                 }
                                 if (actionTimer.getElapsedTimeSeconds() > 7) {
+
                                     robot.outtake.ManualLevel(0, 0.75);
-                                    robot.outtake.CloseOuttake(universalValues.OUTTAKE_OPEN);
-                                    actionTimer.resetTimer();
+
+                                    robot.outtake.OpenOuttake(universalValues.OUTTAKE_OPEN);
                                     robot.intake.setPivot(universalValues.INTAKE_DOWN);
+
                                     follower.followPath(grabPickup3, /* holdEnd = */ true);
+
+                                    actionTimer.resetTimer();
                                     singleton2 = true;
                                     singleton = true;
                                     setPathState(6);
                                 }
                             }
+
                         }
                     }
                 }
-                break;
+            }
+            break;
 
-            case 6:
+        case 6:
 
-                //CHECKS IF ROBOT IS AT GRAB POSITION, GRABS SAMPLE, GOES TO SCORING POSITION AND HOLDS
-                if(follower.getPose().getX() > (pickup1Pose.getX() - 1) && follower.getPose().getY() > (pickup1Pose.getY() - 1)) {
-                    if(actionTimer.getElapsedTimeSeconds() > 5) {
-                        if (singleton) {
-                            robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
-                            singleton = false;
-                        }
+            //CHECKS IF ROBOT IS AT GRAB POSITION, GRABS SAMPLE, GOES TO SCORING POSITION AND HOLDS
+            if(follower.getPose().getX() > (pickup1Pose.getX() - 1) && follower.getPose().getY() > (pickup1Pose.getY() - 1)) {
+                if(actionTimer.getElapsedTimeSeconds() > 5) {
+                    if (singleton) {
+                        robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
+                        singleton = false;
                     }
                     if(actionTimer.getElapsedTimeSeconds() > 7) {
                         robot.intake.ManualLevel(0, 1);
@@ -339,12 +369,17 @@ public class BucketAuto extends OpMode {
                                 singleton2 = false;
                             }
                             if (actionTimer.getElapsedTimeSeconds() > 9) {
+
                                 robot.intake.setPivot(universalValues.INTAKE_INT);
+
                                 robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 1);
-                                robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
-                                follower.followPath(scorePickup3, true);
-                                actionTimer.resetTimer();
                                 robot.intake.ManualLevel(0, 1);
+
+                                robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
+
+                                follower.followPath(scorePickup3, true);
+
+                                actionTimer.resetTimer();
                                 isPressed = false;
                                 singleton2 = true;
                                 singleton = true;
@@ -352,157 +387,171 @@ public class BucketAuto extends OpMode {
                             }
                         }
                     }
-                    else{
-                        robot.intake.ManualLevel(universalValues.INTAKE_EXTEND, 1);
-                        if (singleton2 && singleton){
-                            robot.intake.OpenIntake(universalValues.CLAW_OPEN);
-                        }
-                    }
                 }
-                break;
 
-            case 7:
+                else{
 
-                //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES SAMPLE, GOES TO PARKING POSITION AND HOLDS
-                if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1))) {
-                    if (actionTimer.getElapsedTimeSeconds() > 3) {
-                        robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 1);
-                        if (robot.outtake.outtakeMotor.getCurrentPosition() > universalValues.OUTTAKE_EXTEND - 50) {
-                            if (singleton)
-                            {
-                                robot.outtake.setPivot(universalValues.OUTTAKE_DUMP);
-                                singleton = false;
-                            }
+                    if (singleton2 && singleton){
+                        robot.intake.ManualLevel(universalValues.INTAKE_EXTEND, 1);
+                        robot.intake.OpenIntake(universalValues.CLAW_OPEN);
+                    }
 
-                            if (actionTimer.getElapsedTimeSeconds() > 5) {
-                                robot.outtake.OpenOuttake(universalValues.OUTTAKE_OPEN);
-                                if(actionTimer.getElapsedTimeSeconds() > 6){
-                                    if (singleton2) {
-                                        robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
-                                        singleton2 = false;
-                                    }
+                }
+            }
+            break;
+
+        case 7:
+
+            //CHECKS IF ROBOT IS AT SCORE POSITION, SCORES SAMPLE, GOES TO PARKING POSITION AND HOLDS
+            if((follower.getPose().getX() > (scorePose.getX() - 1) && follower.getPose().getY() > (scorePose.getY() - 1))) {
+                if (actionTimer.getElapsedTimeSeconds() > 3) {
+                    robot.outtake.ManualLevel(universalValues.OUTTAKE_EXTEND, 1);
+
+                    if (robot.outtake.outtakeMotor.getCurrentPosition() > universalValues.OUTTAKE_EXTEND - 50) {
+                        if (singleton)
+                        {
+                            robot.outtake.setPivot(universalValues.OUTTAKE_DUMP);
+                            singleton = false;
+                        }
+
+                        if (actionTimer.getElapsedTimeSeconds() > 5) {
+                            robot.outtake.OpenOuttake(universalValues.OUTTAKE_OPEN);
+                            if(actionTimer.getElapsedTimeSeconds() > 6){
+                                if (singleton2) {
+                                    robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
+                                    singleton2 = false;
                                 }
                                 if (actionTimer.getElapsedTimeSeconds() > 7) {
+
                                     robot.outtake.ManualLevel(0, 0.75);
-                                    robot.outtake.CloseOuttake(universalValues.OUTTAKE_OPEN);
-                                    actionTimer.resetTimer();
+
+                                    robot.outtake.OpenOuttake(universalValues.OUTTAKE_OPEN);
+
                                     robot.intake.setPivot(universalValues.INTAKE_DOWN);
+
                                     follower.followPath(park, /* holdEnd = */ true);
+
+                                    actionTimer.resetTimer();
                                     singleton2 = true;
                                     singleton = true;
                                     setPathState(8);
                                 }
                             }
+
                         }
                     }
                 }
-                break;
+            }
+            break;
 
-            //CHECKS IF ROBOT IS AT PARKING POSITION, EXTEND SLIDES AT LEVEL 1 ASCENT POSITION
-            case 8:
-                if(follower.getPose().getX() > (parkPose.getX() - 1) && follower.getPose().getY() > (parkPose.getY() - 1)) {
-                    robot.outtake.ManualLevel(0,0.75);
-                    robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
-                    robot.intake.ManualLevel(0,1);
-                    robot.intake.setPivot(universalValues.INTAKE_INIT);
-                    robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
-                    singleton2 = true;
-                    singleton = true;
-                    setPathState(-1);
-                }
-                break;
-
-            //IF ANYTHING GOES WRONG THEN EMERGENCY PARK
-            case 9:
+        //CHECKS IF ROBOT IS AT PARKING POSITION, EXTEND SLIDES AT LEVEL 1 ASCENT POSITION
+        case 8:
+            if(follower.getPose().getX() > (parkPose.getX() - 1) && follower.getPose().getY() > (parkPose.getY() - 1)) {
+                robot.outtake.ManualLevel(0,0.75);
                 robot.intake.ManualLevel(0,1);
-                robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
-                robot.intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
-                robot.intake.setPivot(universalValues.INTAKE_INIT);
+
                 robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
-                robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
-                PathChain parkEmergency;
-                parkEmergency = follower.pathBuilder()
-                        .setZeroPowerAccelerationMultiplier(8)
-                        .addPath(new BezierLine(new Point(follower.getPose()), new Point(parkEmergencyPose)))
-                        .setLinearHeadingInterpolation(follower.getPose().getHeading(), parkEmergencyPose.getHeading())
-                        .build();
-                follower.followPath(parkEmergency, /* holdEnd = */ true);
-                break;
-        }
 
-        }
+                robot.intake.setPivot(universalValues.INTAKE_INIT);
+                robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
 
+                singleton2 = true;
+                singleton = true;
+                setPathState(-1);
+            }
+            break;
 
-    /** These change the states of the paths and actions
-     * It will also reset the timers of the individual switches **/
-    public void setPathState(int pState) {
-        pathState = pState;
-        pathTimer.resetTimer();
+        //EMERGENCY PARK CASE
+        case 9:
+            robot.intake.ManualLevel(0,1);
+            robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
+            robot.intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
+            robot.intake.setPivot(universalValues.INTAKE_INIT);
+            robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
+            robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
+            PathChain parkEmergency;
+            parkEmergency = follower.pathBuilder()
+                    .setZeroPowerAccelerationMultiplier(8)
+                    .addPath(new BezierLine(new Point(follower.getPose()), new Point(parkEmergencyPose)))
+                    .setLinearHeadingInterpolation(follower.getPose().getHeading(), parkEmergencyPose.getHeading())
+                    .build();
+            follower.followPath(parkEmergency, /* holdEnd = */ true);
+            break;
     }
 
-    /** This is the main loop of the OpMode, it will run repeatedly after clicking "Play". **/
-    @Override
-    public void loop() {
-
-        // These loop the movements of the robot
-        follower.update();
-        autonomousPathUpdate();
-
-        // Feedback to Driver Hub
-        telemetry.addData("path state", pathState);
-        telemetry.addData("x", follower.getPose().getX());
-        telemetry.addData("y", follower.getPose().getY());
-        telemetry.addData("heading", follower.getPose().getHeading());
-        telemetry.update();
     }
 
-    /** This method is called once at the init of the OpMode. **/
-    @Override
-    public void init() {
-        robot = new robot(hardwareMap);
-        pathTimer = new Timer();
-        actionTimer = new Timer();
-        opmodeTimer = new Timer();
-        opmodeTimer.resetTimer();
-        actionTimer2 = new Timer();
-        actionTimer2.resetTimer();
 
-        follower = new Follower(hardwareMap);
-        follower.setStartingPose(startPose);
+/** These change the states of the paths and actions
+ * It will also reset the timers of the individual switches **/
+public void setPathState(int pState) {
+    pathState = pState;
+    pathTimer.resetTimer();
+}
+
+/** This is the main loop of the OpMode, it will run repeatedly after clicking "Play". **/
+@Override
+public void loop() {
+
+    // These loop the movements of the robot
+    follower.update();
+    autonomousPathUpdate();
+
+    // Feedback to Driver Hub
+    telemetry.addData("path state", pathState);
+    telemetry.addData("x", follower.getPose().getX());
+    telemetry.addData("y", follower.getPose().getY());
+    telemetry.addData("heading", follower.getPose().getHeading());
+    telemetry.update();
+}
+
+/** This method is called once at the init of the OpMode. **/
+@Override
+public void init() {
+    robot = new robot(hardwareMap);
+    pathTimer = new Timer();
+    actionTimer = new Timer();
+    opmodeTimer = new Timer();
+    opmodeTimer.resetTimer();
+    actionTimer2 = new Timer();
+    actionTimer2.resetTimer();
+
+    follower = new Follower(hardwareMap);
+    follower.setStartingPose(startPose);
 
 
-        telemetry.update();
+    telemetry.update();
 
-        buildPaths();
+    buildPaths();
 
 
-        // Set the subsystems to positions for init
-        robot.intake.ManualLevel(0,1);
-        robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
-        robot.intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
-        robot.intake.setPivot(universalValues.INTAKE_INIT);
-        robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
-        robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
-    }
+    // Set the subsystems to positions for init
+    robot.intake.ManualLevel(0,1);
+    robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
+    robot.intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
+    robot.intake.setPivot(universalValues.INTAKE_INIT);
+    robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
+    robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
+}
 
-    /** This method is called continuously after Init while waiting for "play". **/
-    @Override
-    public void init_loop() {
-        opmodeTimer.resetTimer();
-        actionTimer.resetTimer();
-        actionTimer2.resetTimer();
-    }
+/** This method is called continuously after Init while waiting for "play". **/
+@Override
+public void init_loop() {
+    opmodeTimer.resetTimer();
+    actionTimer.resetTimer();
+    actionTimer2.resetTimer();
+}
 
-    /** This method is called once at the start of the OpMode.
-     * It runs all the setup actions, including building paths and starting the path system **/
-    @Override
-    public void start() {
-        opmodeTimer.resetTimer();
-        setPathState(0);
-    }
+/** This method is called once at the start of the OpMode.
+ * It runs all the setup actions, including building paths and starting the path system **/
+@Override
+public void start() {
+    opmodeTimer.resetTimer();
+    setPathState(0);
+}
 
-    /** We do not use this because everything should automatically disable **/
-    @Override
-    public void stop() {
-    }
+/** We do not use this because everything should automatically disable **/
+@Override
+public void stop() {
+}
 }
