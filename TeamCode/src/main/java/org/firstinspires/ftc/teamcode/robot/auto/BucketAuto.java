@@ -4,13 +4,13 @@ package org.firstinspires.ftc.teamcode.robot.auto;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pedroPathing.follower.Follower;
-import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pedroPathing.localization.Pose;
-import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pedroPathing.pathGeneration.BezierCurve;
-import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pedroPathing.pathGeneration.BezierLine;
-import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pedroPathing.pathGeneration.PathChain;
-import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pedroPathing.pathGeneration.Point;
-import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pedroPathing.util.Timer;
+import org.firstinspires.ftc.teamcode.robot.subsystems.drive.follower.Follower;
+import org.firstinspires.ftc.teamcode.robot.subsystems.drive.localization.Pose;
+import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pathGeneration.BezierCurve;
+import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pathGeneration.BezierLine;
+import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pathGeneration.PathChain;
+import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pathGeneration.Point;
+import org.firstinspires.ftc.teamcode.robot.subsystems.drive.util.Timer;
 import org.firstinspires.ftc.teamcode.robot.subsystems.robot;
 import org.firstinspires.ftc.teamcode.robot.subsystems.universalValues;
 

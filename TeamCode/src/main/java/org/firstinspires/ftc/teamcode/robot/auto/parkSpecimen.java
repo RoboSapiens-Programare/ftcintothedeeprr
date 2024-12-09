@@ -3,11 +3,11 @@ package org.firstinspires.ftc.teamcode.robot.auto;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pedroPathing.follower.Follower;
-import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pedroPathing.localization.Pose;
-import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pedroPathing.pathGeneration.BezierLine;
-import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pedroPathing.pathGeneration.PathChain;
-import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pedroPathing.pathGeneration.Point;
+import org.firstinspires.ftc.teamcode.robot.subsystems.drive.follower.Follower;
+import org.firstinspires.ftc.teamcode.robot.subsystems.drive.localization.Pose;
+import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pathGeneration.BezierLine;
+import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pathGeneration.PathChain;
+import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.robot.subsystems.robot;
 import org.firstinspires.ftc.teamcode.robot.subsystems.universalValues;
 
@@ -31,7 +31,6 @@ park = follower.pathBuilder()
 
 public void autonomousPathUpdate() {
 if (singleton) {
-    robot.intake.setPivot(universalValues.INTAKE_INT);
     follower.followPath(park);
     singleton = false;
 }
