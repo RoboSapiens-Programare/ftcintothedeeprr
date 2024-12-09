@@ -19,9 +19,6 @@ public class ParkSpecimen extends OpMode {
     private Follower follower;
     private int pathState;
     private final Pose startPose = new Pose(8,49, Math.toRadians(0)); // visualizer: (x: 10 y: 46)
-    private final Pose parkPose = new Pose(8,10, Math.toRadians(0));
-
-    private PathChain park;
     private boolean singleton = true;
     private PathChain samplePush;
 
@@ -37,7 +34,7 @@ public class ParkSpecimen extends OpMode {
                                 new Point(70.000, 28.000, Point.CARTESIAN)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+//                .setConstantHeadingInterpolation(Math.toRadians(0))
                 .addPath(
                         // Line 2
                         new BezierLine(
@@ -45,7 +42,6 @@ public class ParkSpecimen extends OpMode {
                                 new Point(8.000, 28.000, Point.CARTESIAN)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                 .addPath(
                         // Line 3
                         new BezierCurve(
@@ -54,7 +50,6 @@ public class ParkSpecimen extends OpMode {
                                 new Point(70.000, 17.000, Point.CARTESIAN)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                 .addPath(
                         // Line 4
                         new BezierLine(
@@ -62,8 +57,6 @@ public class ParkSpecimen extends OpMode {
                                 new Point(8.000, 17.000, Point.CARTESIAN)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
-                .setReversed(true)
                 .addPath(
                         // Line 5
                         new BezierCurve(
@@ -72,7 +65,6 @@ public class ParkSpecimen extends OpMode {
                                 new Point(70.000, 12.000, Point.CARTESIAN)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                 .addPath(
                         // Line 6
                         new BezierLine(
@@ -80,16 +72,9 @@ public class ParkSpecimen extends OpMode {
                                 new Point(8.000, 12.000, Point.CARTESIAN)
                         )
                 )
-                .setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
                 .build();
     }
 
-    public void buildPaths() {
-        park = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(startPose), new Point(parkPose)))
-                .setLinearHeadingInterpolation(startPose.getHeading(), parkPose.getHeading())
-                .build();
-    }
 
 
 
@@ -117,7 +102,11 @@ public class ParkSpecimen extends OpMode {
 
     @Override
     public void loop() {
-        follower.followPath(samplePush);
+        if (singleton) {
+            follower.followPath(samplePush);
+            singleton = false;
+        }
+
         follower.update();
     }
 }
