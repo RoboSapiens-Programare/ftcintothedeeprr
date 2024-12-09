@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.robot;
 import org.firstinspires.ftc.teamcode.robot.subsystems.universalValues;
 
 
-@Autonomous(name = "Auto Bucket", group = "Autonomous")
+@Autonomous(name = "Bucket Auto", group = "Autonomous")
 public class BucketAuto extends OpMode {
 private org.firstinspires.ftc.teamcode.robot.subsystems.robot robot = null;
 private Follower follower;
@@ -37,12 +37,12 @@ private int pathState;
 //TODO : update paths with correct poses and/or bezier curves
 
 private final Pose startPose = new Pose(8,103, Math.toRadians(-90));
-private final Pose scorePose = new Pose(6,130, Math.toRadians(315));
-private final Pose pickup1Pose = new Pose(10, 127, Math.toRadians(0));
+private final Pose scorePose = new Pose(5.5,124.5, Math.toRadians(315));
+private final Pose pickup1Pose = new Pose(10, 126, Math.toRadians(0));
 private final Pose pickup2Pose = new Pose(10, 117, Math.toRadians(0));
 private final Pose intpushPose = new Pose(72.6, 118.6, Math.toRadians(-90));
 private final Pose pushpose = new Pose(8, 130, Math.toRadians(-90));
-private final Pose parkPose = new Pose(61,94, Math.toRadians(-90));
+private final Pose parkPose = new Pose(61,90, Math.toRadians(-90));
 private final Pose parkEmergencyPose = new Pose(14,29, Math.toRadians(-90));
 private boolean isPressed = false;
 
@@ -355,8 +355,8 @@ public void autonomousPathUpdate() {
 
         case 6:
             if(follower.getPose().getX() > (intpushPose.getX() - 1) && follower.getPose().getY() > (intpushPose.getY() - 1)) {
-                follower.followPath(pushPickup3, /* holdEnd = */ true);
-                setPathState(7);
+                follower.followPath(park, /* holdEnd = */ true);
+                setPathState(8);
                 }
             break;
 
@@ -370,6 +370,7 @@ public void autonomousPathUpdate() {
 
         //CHECKS IF ROBOT IS AT PARKING POSITION, EXTEND SLIDES AT LEVEL 1 ASCENT POSITION
         case 8:
+            robot.intake.setPivot(0.55);
             if(follower.getPose().getX() > (parkPose.getX() - 1) && follower.getPose().getY() > (parkPose.getY() - 1)) {
                 robot.outtake.ManualLevel(0,0.75);
                 robot.intake.ManualLevel(0,1);
