@@ -166,7 +166,6 @@ public class fsmDriveMode extends OpMode {
     private void updateFollower() {
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, false);
         follower.update();
-        telemetry.update();
     }
 
     @Override
@@ -208,6 +207,8 @@ public class fsmDriveMode extends OpMode {
                 intakeState = IntakeState.INTAKE_START;
                 break;
         }
+
         updateFollower();
+        telemetry.update();
     }
 }
