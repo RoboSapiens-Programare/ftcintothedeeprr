@@ -45,15 +45,14 @@ public class ParkSpecimen extends OpMode {
                                 new Point(45.103, 50.551, Point.CARTESIAN),
                                 new Point(firstSampleGrabPose)
                         )
-                ).build();
+                ).setLinearHeadingInterpolation(0, 0).build();
         firstSampleScore = follower.pathBuilder()
                 .addPath(
                         new BezierLine(
                                 new Point(firstSampleGrabPose),
                                 new Point(firstSampleScorePose)
                         )
-                )
-                .build();
+                ).setLinearHeadingInterpolation(0, 0).build();
 
         secondSampleGrab = follower.pathBuilder()
                 .addPath(
@@ -62,16 +61,14 @@ public class ParkSpecimen extends OpMode {
                                 new Point(61.925, 32.159, Point.CARTESIAN),
                                 new Point(secondSampleGrabPose)
                         )
-                )
-                .build();
+                ).setLinearHeadingInterpolation(0, 0).build();
         secondSampleScore = follower.pathBuilder()
                 .addPath(
                         new BezierLine(
                                 new Point(secondSampleGrabPose),
                                 new Point(secondSampleScorePose)
                         )
-                )
-                .build();
+                ).setLinearHeadingInterpolation(0, 0).build();
 
         thirdSampleGrab = follower.pathBuilder()
                 .addPath(
@@ -80,21 +77,25 @@ public class ParkSpecimen extends OpMode {
                                 new Point(75.832, 22.065, Point.CARTESIAN),
                                 new Point(thirdSampleGrabPose)
                         )
-                )
-                .build();
+                ).setLinearHeadingInterpolation(0, 0).build();
         thirdSampleScore = follower.pathBuilder()
                 .addPath(
                         new BezierLine(
                                 new Point(thirdSampleGrabPose),
                                 new Point(thirdSampleScorePose)
                         )
-                )
-                .build();
+                ).setLinearHeadingInterpolation(0, 0).build();
     }
 
     private void setPathState(PathState state) {
         pathState = state;
     }
+
+
+    private boolean isAtPose(Pose pose) {
+        return (follower.getPose().getX() > (pose.getX() + 1) && follower.getPose().getY() > (pose.getY() - 1));
+    }
+
 
     private void autonomousPathUpdate() {
         switch (pathState) {
@@ -103,26 +104,40 @@ public class ParkSpecimen extends OpMode {
                 setPathState(PathState.SCORE_FIRST_SAMPLE);
                 break;
             case SCORE_FIRST_SAMPLE:
-                follower.followPath(firstSampleScore);
-                setPathState(PathState.GRAB_SECOND_SAMPLE);
+                if(isAtPose(firstSampleGrabPose)) {
+                    follower.followPath(firstSampleScore, true);
+                    setPathState(PathState.GRAB_SECOND_SAMPLE);
+                }
                 break;
+
             case GRAB_SECOND_SAMPLE:
-                follower.followPath(secondSampleGrab);
-                setPathState(PathState.SCORE_SECOND_SAMPLE);
+                if(!isAtPose(firstSampleScorePose)) {
+                    follower.followPath(secondSampleGrab, true);
+                    setPathState(PathState.SCORE_SECOND_SAMPLE);
+                }
                 break;
             case SCORE_SECOND_SAMPLE:
-                follower.followPath(secondSampleScore);
-                setPathState(PathState.GRAB_THIRD_SAMPLE);
+                if(!isAtPose(secondSampleGrabPose)) {
+                    follower.followPath(secondSampleScore, true);
+                    setPathState(PathState.GRAB_THIRD_SAMPLE);
+                }
                 break;
+
             case GRAB_THIRD_SAMPLE:
-                follower.followPath(thirdSampleGrab);
-                setPathState(PathState.SCORE_THIRD_SAMPLE);
+                if(!isAtPose(secondSampleScorePose)) {
+                    follower.followPath(thirdSampleGrab, true);
+                    setPathState(PathState.SCORE_THIRD_SAMPLE);
+                }
                 break;
             case SCORE_THIRD_SAMPLE:
-                follower.followPath(thirdSampleScore);
-                setPathState(PathState.PATH_END);
+                if(!isAtPose(thirdSampleGrabPose)) {
+                    follower.followPath(thirdSampleScore, true);
+                    setPathState(PathState.PATH_END);
+                }
                 break;
+
             case PATH_END:
+                // if(!isAtPose(thirdSampleScorePose)) break;
                 // maybe park robot somewhere else
                 break;
         }
@@ -166,5 +181,12 @@ public class ParkSpecimen extends OpMode {
         telemetry.addData("y", follower.getPose().getY());
         telemetry.addData("heading", follower.getPose().getHeading());
         telemetry.update();
+    }
+
+    /** This method is called once at the start of the OpMode.
+     * It runs all the setup actions, including building paths and starting the path system **/
+    @Override
+    public void start() {
+        setPathState(PathState.PATH_START);
     }
 }
