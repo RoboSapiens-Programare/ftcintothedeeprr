@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.robot.subsystems.drive.follower.Follower;
+import org.firstinspires.ftc.teamcode.robot.subsystems.drive.localization.Pose;
 import org.firstinspires.ftc.teamcode.robot.subsystems.robot;
 
 @TeleOp(name = "FSM DRIVE MODE", group = "FSMTELEOP")
@@ -176,6 +177,7 @@ public class fsmDriveMode extends OpMode {
         outtakeTimer.reset();
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+        follower.startTeleopDrive();
         initializeRobot();
     }
 
