@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.robot.teleop;
 
 import static org.firstinspires.ftc.teamcode.robot.subsystems.universalValues.*;
 
+import static java.lang.Math.abs;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -17,10 +19,11 @@ public class fsmDriveMode extends OpMode {
     private boolean isHorizontal = true;
     private boolean isStarted = true;
     private boolean isPressed = false;
+    private boolean isSquare = false;
     
     private enum IntakeState {
         INTAKE_START, INTAKE_CLAW_COLLECT_POSITION, INTAKE_RETRACT, INTAKE_EXTEND,
-        OUTTAKE_MID, OUTTAKE_EXTEND, OUTTAKE_RETRACT
+        OUTTAKE_MID, OUTTAKE_EXTEND, OUTTAKE_RETRACT, OUTTAKE_SAMPLE
     }
     
     private static final int OUTTAKE_LOW = 0;
@@ -56,17 +59,19 @@ public class fsmDriveMode extends OpMode {
             robot.outtake.ManualLevel(OUTTAKE_EXTEND_MID, 1);
             intakeState = IntakeState.OUTTAKE_MID;
         }
-        if (gamepad1.dpad_down) {
-            robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
+        if (gamepad2.square) {
+            robot.outtake.setPivot(OUTTAKE_CLIPON_UP);
+            intakeTimer.reset();
+            intakeState = IntakeState.OUTTAKE_SAMPLE;
         }
     }
 
     private void handleIntakeExtend() {
-        if (Math.abs(robot.intake.intakeMotor.getCurrentPosition() - INTAKE_EXTEND) < 10) {
+        if (abs(robot.intake.intakeMotor.getCurrentPosition() - INTAKE_EXTEND) < 10) {
             robot.intake.setPivot(INTAKE_DOWN);
             robot.intake.setClawPivot(CLAW_HORIZONTAL);
             clawPivot = CLAW_HORIZONTAL;
-            robot.intake.CloseIntake(CLAW_OPEN);
+            robot.intake.OpenIntake(CLAW_OPEN);
             intakeTimer.reset();
             intakeState = IntakeState.INTAKE_CLAW_COLLECT_POSITION;
         }
@@ -112,7 +117,7 @@ public class fsmDriveMode extends OpMode {
             robot.outtake.OpenOuttake(OUTTAKE_OPEN);
             robot.intake.setClawPivot(CLAW_HORIZONTAL);
             clawPivot = CLAW_HORIZONTAL;
-            robot.intake.setPivot(INTAKE_INT);
+            robot.intake.setPivot(INTAKE_UP);
             robot.intake.ManualLevel(INTAKE_LOW, 1);
             intakeState = IntakeState.INTAKE_RETRACT;
             intakeTimer.reset();
@@ -125,7 +130,13 @@ public class fsmDriveMode extends OpMode {
             robot.intake.setPivot(INTAKE_UP);
             if (intakeTimer.seconds() > CLAW_TIMER) {
                 robot.intake.OpenIntake(CLAW_OPEN);
+                robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
+                robot.intake.ManualLevel(300,1);
                 intakeTimer.reset();
+            }
+            if(intakeTimer.seconds() > SAMPLE_TIMER){
+                robot.intake.setPivot(INTAKE_INT);
+                robot.intake.ManualLevel(INTAKE_LOW,1);
                 intakeState = IntakeState.INTAKE_START;
             }
         }
@@ -140,7 +151,7 @@ public class fsmDriveMode extends OpMode {
         if (gamepad2.right_bumper) {
             robot.outtake.OpenOuttake(OUTTAKE_OPEN);
         }
-        if (Math.abs(robot.outtake.outtakeMotor.getCurrentPosition() - OUTTAKE_EXTEND_MID) < 100 && gamepad2.triangle) {
+        if (abs(robot.outtake.outtakeMotor.getCurrentPosition() - OUTTAKE_EXTEND_MID) < 100 && gamepad2.triangle) {
             robot.outtake.ManualLevel(OUTTAKE_EXTEND, 1);
             intakeState = IntakeState.OUTTAKE_EXTEND;
         }
@@ -163,8 +174,24 @@ public class fsmDriveMode extends OpMode {
         intakeState = IntakeState.INTAKE_START;
     }
 
-    private void updateFollower() {
+    private void handleOuttakeSample() {
+        if(gamepad1.square) {
+            isSquare = true;
+            intakeTimer.reset();
+        }
+        if(isSquare && abs(gamepad1.left_stick_y) > 0.2){
+            robot.outtake.setPivot(OUTTAKE_CLIPON_DOWN);
+            if(intakeTimer.seconds() > 0.1){
+                robot.outtake.OpenOuttake(OUTTAKE_OPEN);
+                robot.outtake.setPivot(OUTTAKE_COLLECT);
+                intakeState = IntakeState.INTAKE_START;
+            }
+        }
+    }
+
+    private void updateFollower(double power) {
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, false);
+        follower.setMaxPower(power);
         follower.update();
     }
 
@@ -204,12 +231,17 @@ public class fsmDriveMode extends OpMode {
             case OUTTAKE_RETRACT:
                 handleOuttakeRetract();
                 break;
+            case OUTTAKE_SAMPLE:
+                handleOuttakeSample();
+                break;
             default:
                 intakeState = IntakeState.INTAKE_START;
                 break;
         }
-
-        updateFollower();
+        if(intakeState == IntakeState.OUTTAKE_SAMPLE) {
+            updateFollower(0.4);
+        }
+        else updateFollower(1);
         telemetry.update();
     }
 }
