@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.robot.subsystems.drive.follower.Follower;
-import org.firstinspires.ftc.teamcode.robot.subsystems.drive.localization.Pose;
 import org.firstinspires.ftc.teamcode.robot.subsystems.robot;
 
 @TeleOp(name = "FSM DRIVE MODE", group = "FSMTELEOP")
@@ -58,7 +57,7 @@ public class fsmDriveMode extends OpMode {
             intakeState = IntakeState.OUTTAKE_MID;
         }
         if (gamepad1.dpad_down) {
-            robot.outtake.setPivot(OUTTAKE_DUMP);
+            robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
         }
     }
 
@@ -137,7 +136,7 @@ public class fsmDriveMode extends OpMode {
             robot.outtake.ManualLevel(OUTTAKE_LOW, 0.4);
             intakeState = IntakeState.OUTTAKE_RETRACT;
         }
-        robot.outtake.setPivot(OUTTAKE_DUMP);
+        robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
         if (gamepad2.right_bumper) {
             robot.outtake.OpenOuttake(OUTTAKE_OPEN);
         }
@@ -152,7 +151,7 @@ public class fsmDriveMode extends OpMode {
             robot.outtake.ManualLevel(OUTTAKE_LOW, 0.4);
             intakeState = IntakeState.OUTTAKE_RETRACT;
         }
-        robot.outtake.setPivot(OUTTAKE_DUMP);
+        robot.outtake.setPivot(OUTTAKE_DUMP_BUCKET);
         if (gamepad2.right_bumper) {
             robot.outtake.OpenOuttake(OUTTAKE_OPEN);
         }

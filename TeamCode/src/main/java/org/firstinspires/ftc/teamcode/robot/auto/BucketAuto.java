@@ -138,7 +138,7 @@ public void autonomousPathUpdate() {
 
                         if (singleton)
                         {
-                            robot.outtake.setPivot(universalValues.OUTTAKE_DUMP);
+                            robot.outtake.setPivot(universalValues.OUTTAKE_DUMP_BUCKET);
                             singleton = false;
                         }
 
@@ -230,7 +230,7 @@ public void autonomousPathUpdate() {
                     if (robot.outtake.outtakeMotor.getCurrentPosition() > universalValues.OUTTAKE_EXTEND - 50) {
                         if (singleton)
                         {
-                            robot.outtake.setPivot(universalValues.OUTTAKE_DUMP);
+                            robot.outtake.setPivot(universalValues.OUTTAKE_DUMP_BUCKET);
                             singleton = false;
                         }
 
@@ -320,7 +320,7 @@ public void autonomousPathUpdate() {
                     if (robot.outtake.outtakeMotor.getCurrentPosition() > universalValues.OUTTAKE_EXTEND - 50) {
                         if (singleton)
                         {
-                            robot.outtake.setPivot(universalValues.OUTTAKE_DUMP);
+                            robot.outtake.setPivot(universalValues.OUTTAKE_DUMP_BUCKET);
                             singleton = false;
                         }
 
