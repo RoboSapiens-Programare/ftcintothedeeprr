@@ -208,10 +208,10 @@ public class ClipSpecimenOnBar extends OpMode {
                             singleton = false;
                         }
                         transfer();
-                        if (stateTimer.getElapsedTimeSeconds()>1) {
+                        if (isSpecimeninClaw) {
                                 follower.followPath(toBar2, true);
                         }
-                        if (stateTimer.getElapsedTimeSeconds()>5) {
+                        if (isTransferDone) {
                             setPathState(7);
                         }
                 }
