@@ -20,6 +20,8 @@ public class fsmDriveMode extends OpMode {
     private boolean isStarted = true;
     private boolean isPressed = false;
     private boolean isSquare = false;
+    private boolean isTimer = true;
+    private boolean isMoving = false;
     
     private enum IntakeState {
         INTAKE_START, INTAKE_CLAW_COLLECT_POSITION, INTAKE_RETRACT, INTAKE_EXTEND,
@@ -43,6 +45,8 @@ public class fsmDriveMode extends OpMode {
 
     private void handleIntakeStart() {
         isPressed = false;
+        isSquare = false;
+        isMoving = false;
         if (isStarted) {
             robot.intake.setPivot(INTAKE_INT);
             isStarted = false;
@@ -175,22 +179,34 @@ public class fsmDriveMode extends OpMode {
     }
 
     private void handleOuttakeSample() {
-        if(gamepad1.square) {
+        if(gamepad1.square && !isSquare) {
             isSquare = true;
-            intakeTimer.reset();
+            isTimer = true;
         }
-        if(isSquare && abs(gamepad1.left_stick_y) > 0.2){
+        if(abs(gamepad1.left_stick_y) > 0.02 && isSquare && !isMoving){
+            isMoving = true;
+        }
+        if(isSquare && isMoving){
+            if(isTimer){
+                intakeTimer.reset();
+                isTimer = false;
+            }
             robot.outtake.setPivot(OUTTAKE_CLIPON_DOWN);
-            if(intakeTimer.seconds() > 0.1){
+            if(intakeTimer.seconds() > 0.3){
                 robot.outtake.OpenOuttake(OUTTAKE_OPEN);
-                robot.outtake.setPivot(OUTTAKE_COLLECT);
-                intakeState = IntakeState.INTAKE_START;
+
+                if(intakeTimer.seconds() > 0.5) {
+                    robot.outtake.setPivot(OUTTAKE_CLIPON_UP);
+                    robot.outtake.setPivot(OUTTAKE_COLLECT);
+                    intakeState = IntakeState.INTAKE_START;
+                    intakeTimer.reset();
+                }
             }
         }
     }
 
     private void updateFollower(double power) {
-        follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, false);
+        follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
         follower.setMaxPower(power);
         follower.update();
     }
