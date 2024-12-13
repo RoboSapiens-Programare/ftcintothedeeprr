@@ -31,12 +31,12 @@ public class ClipSpecimenOnBar extends OpMode {
 
     private final Pose startPose = new Pose(10.7,49, Math.toRadians(180));
     private final Pose barCliponPose1 = new Pose(32.75,70.5, Math.toRadians(180));
-    private final Pose behindSample1 = new Pose(61.760, 25.400, Math.toRadians(180));
-    private final Pose pushSample1 = new Pose(15.272, 23.400, Math.toRadians(180));
-    private final Pose behindSample2 = new Pose(61.760, 13.069, Math.toRadians(180));
-    private final Pose pushSample2 = new Pose(15.272, 12.620, Math.toRadians(180));
-    private final Pose behindSample3 = new Pose(61.535, 6.556, Math.toRadians(180));
-    private final Pose pushSample3 = new Pose(15.272, 6.332, Math.toRadians(180));
+    private final Pose behindSample1 = new Pose(65, 29.500, Math.toRadians(180));
+    private final Pose pushSample1 = new Pose(18.272, 29.400, Math.toRadians(180));
+    private final Pose behindSample2 = new Pose(64.760, 19.069, Math.toRadians(180));
+    private final Pose pushSample2 = new Pose(18.272, 18.620, Math.toRadians(180));
+    private final Pose behindSample3 = new Pose(64.535, 12.556, Math.toRadians(180));
+    private final Pose pushSample3 = new Pose(18.272, 12.332, Math.toRadians(180));
 
 
     private PathChain toBar1, toSample1, toHuman1, toSample2, toHuman2, toSample3, toHuman3;
@@ -52,9 +52,9 @@ public class ClipSpecimenOnBar extends OpMode {
                 .addPath(
                         new BezierCurve(
                                 new Point(barCliponPose1),
-                                new Point(29.420, 38.875, Point.CARTESIAN),
-                                new Point(38.628, 33.485, Point.CARTESIAN),
-                                new Point(61.535, 36.404, Point.CARTESIAN),
+                                new Point(29.420, 39.875, Point.CARTESIAN),
+                                new Point(38.628, 34.485, Point.CARTESIAN),
+                                new Point(61.535, 37.404, Point.CARTESIAN),
                                 new Point(behindSample1)
                         )
                 )
@@ -62,6 +62,7 @@ public class ClipSpecimenOnBar extends OpMode {
                 .build();
 
         toHuman1 = follower.pathBuilder()
+                //.setZeroPowerAccelerationMultiplier(3)
                 .addPath(new BezierLine(new Point(behindSample1), new Point(pushSample1)))
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
@@ -70,7 +71,7 @@ public class ClipSpecimenOnBar extends OpMode {
                 .addPath(
                         new BezierCurve(
                                 new Point(pushSample1),
-                                new Point(71.866, 26.544, Point.CARTESIAN),
+                                new Point(74.866, 32.544, Point.CARTESIAN),
                                 new Point(behindSample2)
                         )
                 )
@@ -85,7 +86,7 @@ public class ClipSpecimenOnBar extends OpMode {
         toSample3 = follower.pathBuilder()
                 .addPath(new BezierCurve(
                         new Point(pushSample2),
-                        new Point(71.866, 14.417, Point.CARTESIAN),
+                        new Point(74.866, 20.417, Point.CARTESIAN),
                         new Point(behindSample3)
                 ))
                 .setConstantHeadingInterpolation(Math.toRadians(180))
@@ -113,6 +114,7 @@ public class ClipSpecimenOnBar extends OpMode {
                     follower.followPath(toBar1,true);
 
                 setPathState(1);
+                break;
             case(1):
                 telemetry.addData("statetimer", stateTimer.getElapsedTimeSeconds());
                 if((follower.getPose().getX() > (barCliponPose1.getX() - 1) && follower.getPose().getY() > (barCliponPose1.getY() - 1))) {
@@ -137,6 +139,8 @@ public class ClipSpecimenOnBar extends OpMode {
                                 if (stateTimer.getElapsedTimeSeconds() > 2.25)
                                 {
                                     follower.followPath(toSample1);
+                                    robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
+                                    robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
                                     setPathState(2);
                                 }
 
@@ -144,8 +148,42 @@ public class ClipSpecimenOnBar extends OpMode {
                         }
                     }
                 }
+                break;
             case(2):
-
+                if((follower.getPose().getX() > (behindSample1.getX() - 1) && follower.getPose().getY() > (behindSample1.getY() + 1)))
+                {
+                    follower.followPath(toHuman1, true);
+                    setPathState(3);
+                }
+                break;
+            case(3):
+                if((follower.getPose().getX() < (pushSample1.getX() + 1) && follower.getPose().getY() < (pushSample1.getY() + 1)))
+                {
+                    follower.followPath(toSample2, true);
+                    setPathState(4);
+                }
+                break;
+            case(4):
+                if((follower.getPose().getX() > (behindSample2.getX() - 1) && follower.getPose().getY() > (behindSample2.getY() - 1)))
+                {
+                    follower.followPath(toHuman2, true);
+                    setPathState(5);
+                }
+                break;
+            case(5):
+                if((follower.getPose().getX() < (pushSample2.getX() + 1) && follower.getPose().getY() < (pushSample2.getY() + 1)))
+                {
+                    follower.followPath(toSample3, true);
+                    setPathState(6);
+                }
+                break;
+            case(6):
+                if((follower.getPose().getX() > (behindSample3.getX() - 1) && follower.getPose().getY() > (behindSample3.getY() - 1)))
+                {
+                    follower.followPath(toHuman3, true);
+                    setPathState(7);
+                }
+                break;
         }
     }
 
