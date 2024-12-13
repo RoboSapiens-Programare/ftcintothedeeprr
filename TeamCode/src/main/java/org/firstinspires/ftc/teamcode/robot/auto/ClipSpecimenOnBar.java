@@ -219,9 +219,9 @@ public class ClipSpecimenOnBar extends OpMode {
                         if (isSpecimeninClaw) {
                             follower.followPath(toBar2, true);
                         }
-                        if (isTransferDone) {
-                            setPathState(7);
-                        }
+                }
+                if (isTransferDone) {
+                    setPathState(7);
                 }
                 break;
             case(7):
@@ -264,9 +264,9 @@ public class ClipSpecimenOnBar extends OpMode {
                     if (isSpecimeninClaw) {
                         follower.followPath(toBar3, true);
                     }
-                    if (isTransferDone) {
-                        setPathState(9);
-                    }
+                }
+                if (isTransferDone) {
+                    setPathState(9);
                 }
                 break;
             case(9):
