@@ -27,8 +27,8 @@ public class universalValues {
     public static double OUTTAKE_CLIPON_DOWN = 0.90;
     public static double OUTTAKE_PICKUP_BAR = 1;
 
-    public static double CLAW_TIMER = 1.8;
-    public static double SAMPLE_TIMER = 0.5;
+    public static double CLAW_TIMER = 3.5;
+    public static double SAMPLE_TIMER = 1.5;
     public static double PIVOT_TIMER = 0.0125;
 
 

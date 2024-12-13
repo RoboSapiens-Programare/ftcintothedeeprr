@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.robot.subsystems.drive.localization.localizers;
 
-import static org.firstinspires.ftc.teamcode.robot.subsystems.drive.tuning.FollowerConstants.leftFrontMotorName;
-import static org.firstinspires.ftc.teamcode.robot.subsystems.drive.tuning.FollowerConstants.leftRearMotorName;
-import static org.firstinspires.ftc.teamcode.robot.subsystems.drive.tuning.FollowerConstants.rightFrontMotorName;
-import static org.firstinspires.ftc.teamcode.robot.subsystems.drive.tuning.FollowerConstants.rightRearMotorName;
+import static org.firstinspires.ftc.teamcode.robot.subsystems.drive.follower.FollowerConstants.leftFrontMotorName;
+import static org.firstinspires.ftc.teamcode.robot.subsystems.drive.follower.FollowerConstants.leftRearMotorName;
+import static org.firstinspires.ftc.teamcode.robot.subsystems.drive.follower.FollowerConstants.rightFrontMotorName;
+import static org.firstinspires.ftc.teamcode.robot.subsystems.drive.follower.FollowerConstants.rightRearMotorName;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotorEx;

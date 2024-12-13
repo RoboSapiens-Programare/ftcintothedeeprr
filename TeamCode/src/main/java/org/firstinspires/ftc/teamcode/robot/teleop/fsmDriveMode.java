@@ -138,7 +138,7 @@ public class fsmDriveMode extends OpMode {
                 robot.intake.ManualLevel(300,1);
                 intakeTimer.reset();
             }
-            if(intakeTimer.seconds() > SAMPLE_TIMER){
+            if(robot.intake.intakeMotor.getCurrentPosition() > 200){
                 robot.intake.setPivot(INTAKE_INT);
                 robot.intake.ManualLevel(INTAKE_LOW,1);
                 intakeState = IntakeState.INTAKE_START;

@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.drive.util.Timer;
 import org.firstinspires.ftc.teamcode.robot.subsystems.robot;
 import org.firstinspires.ftc.teamcode.robot.subsystems.universalValues;
 
-@Autonomous(name = "Specimen on bar", group = "Autonomous")
+@Autonomous(name = "Specimen Auto", group = "Autonomous")
 public class ClipSpecimenOnBar extends OpMode {
 
     private org.firstinspires.ftc.teamcode.robot.subsystems.robot robot = null;
@@ -30,6 +30,7 @@ public class ClipSpecimenOnBar extends OpMode {
     private boolean transfersingleton6 = true;
     private boolean isSpecimeninClaw = false;
     private boolean isTransferDone = false;
+    private boolean isPressed = false;
     private int pathState;
 
     // TODO: modify y offset to correct pedro path visualiser offset
@@ -144,7 +145,6 @@ public class ClipSpecimenOnBar extends OpMode {
                 // TODO : fix intake pivot value on line 53 or make dedicated value in universalValues
                 //robot.intake.setPivot(0.55);
                     follower.followPath(toBar1,true);
-
                 setPathState(1);
                 break;
             case(1):
@@ -307,6 +307,7 @@ public class ClipSpecimenOnBar extends OpMode {
             robot.outtake.CloseOuttake(universalValues.OUTTAKE_OPEN);
             robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
             robot.intake.setPivot(universalValues.INTAKE_DOWN+0.05);
+            transferTimer.resetTimer();
 
             transfersingleton1 = false;
         }
@@ -330,11 +331,10 @@ public class ClipSpecimenOnBar extends OpMode {
                         robot.intake.ManualLevel(0, 1);
                         transfersingleton4 = false;
                     }
-                    if (transferTimer.getElapsedTimeSeconds() > 2.25)
+                    if (robot.intake.intakeLimit.isPressed() || isPressed)
                     {
-
+                            isPressed = true;
                             robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
-
                         if (transferTimer.getElapsedTimeSeconds() > 2.5)
                         {
                             robot.intake.OpenIntake(universalValues.CLAW_OPEN);
@@ -350,6 +350,7 @@ public class ClipSpecimenOnBar extends OpMode {
                                     if (transferTimer.getElapsedTimeSeconds() > 3.5)
                                     {
                                         robot.intake.ManualLevel(0, 1);
+                                        isPressed = false;
                                         isTransferDone = true;
                                     }
                                 }
@@ -387,7 +388,6 @@ public class ClipSpecimenOnBar extends OpMode {
     public void loop() {
 
         follower.update();
-//        transfer();
         autonomousUpdate();
 
         telemetry.addData("path state", pathState);

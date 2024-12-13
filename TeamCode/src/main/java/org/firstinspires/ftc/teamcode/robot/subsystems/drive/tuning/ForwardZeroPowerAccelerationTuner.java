@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode.robot.subsystems.drive.tuning;
 
-import static org.firstinspires.ftc.teamcode.robot.subsystems.drive.tuning.FollowerConstants.leftFrontMotorName;
-import static org.firstinspires.ftc.teamcode.robot.subsystems.drive.tuning.FollowerConstants.leftRearMotorName;
-import static org.firstinspires.ftc.teamcode.robot.subsystems.drive.tuning.FollowerConstants.rightFrontMotorName;
-import static org.firstinspires.ftc.teamcode.robot.subsystems.drive.tuning.FollowerConstants.rightRearMotorName;
+import static org.firstinspires.ftc.teamcode.robot.subsystems.drive.follower.FollowerConstants.leftFrontMotorName;
+import static org.firstinspires.ftc.teamcode.robot.subsystems.drive.follower.FollowerConstants.leftRearMotorName;
+import static org.firstinspires.ftc.teamcode.robot.subsystems.drive.follower.FollowerConstants.rightFrontMotorName;
+import static org.firstinspires.ftc.teamcode.robot.subsystems.drive.follower.FollowerConstants.rightRearMotorName;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.robot.subsystems.drive.follower.FollowerConstants;
 import org.firstinspires.ftc.teamcode.robot.subsystems.drive.localization.PoseUpdater;
 import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pathGeneration.MathFunctions;
 import org.firstinspires.ftc.teamcode.robot.subsystems.drive.pathGeneration.Vector;

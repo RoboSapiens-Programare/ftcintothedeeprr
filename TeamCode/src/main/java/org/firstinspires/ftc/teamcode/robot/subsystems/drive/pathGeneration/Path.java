@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.robot.subsystems.drive.pathGeneration;
 
 import org.firstinspires.ftc.teamcode.robot.subsystems.drive.localization.Pose;
-import org.firstinspires.ftc.teamcode.robot.subsystems.drive.tuning.FollowerConstants;
+import org.firstinspires.ftc.teamcode.robot.subsystems.drive.follower.FollowerConstants;
 
 import java.util.ArrayList;
 
