@@ -14,9 +14,6 @@ import org.firstinspires.ftc.teamcode.robot.subsystems.drive.util.Timer;
 import org.firstinspires.ftc.teamcode.robot.subsystems.robot;
 import org.firstinspires.ftc.teamcode.robot.subsystems.universalValues;
 
-import dev.frozenmilk.dairy.core.util.controller.calculation.pid.DoubleComponent;
-import dev.frozenmilk.dairy.core.util.controller.calculation.pid.UnitComponent;
-
 @Autonomous(name = "Specimen on bar", group = "Autonomous")
 public class ClipSpecimenOnBar extends OpMode {
 
@@ -30,16 +27,20 @@ public class ClipSpecimenOnBar extends OpMode {
     // TODO: modify y offset to correct pedro path visualiser offset
 
     private final Pose startPose = new Pose(10.7,49, Math.toRadians(180));
-    private final Pose barCliponPose1 = new Pose(32.75,70.5, Math.toRadians(180));
+    private final Pose barCliponPose1 = new Pose(32.75,64.5, Math.toRadians(180));
     private final Pose behindSample1 = new Pose(65, 29.500, Math.toRadians(180));
     private final Pose pushSample1 = new Pose(18.272, 29.400, Math.toRadians(180));
     private final Pose behindSample2 = new Pose(64.760, 19.069, Math.toRadians(180));
     private final Pose pushSample2 = new Pose(18.272, 18.620, Math.toRadians(180));
+    private final Pose specimenPickup1 = new Pose(29.645, 28.5, Math.toRadians(180));
+    private final Pose barCliponPose2 = new Pose(31.66,66.5, Math.toRadians(180));
+    private final Pose barCliponPose3 = new Pose(31.66, 68.5, Math.toRadians(180));
+    private final Pose barCliponPose4 = new Pose(31.66, 70.5, Math.toRadians(180));
     private final Pose behindSample3 = new Pose(64.535, 12.556, Math.toRadians(180));
     private final Pose pushSample3 = new Pose(18.272, 12.332, Math.toRadians(180));
 
 
-    private PathChain toBar1, toSample1, toHuman1, toSample2, toHuman2, toSample3, toHuman3;
+    private PathChain toBar1, toSample1, toHuman1, toSample2, toHuman2, toSpecimenPickup1, toBar2, toSpecimenPickup2, toBar3, toSample3, toHuman3;
 
     public void buildPaths() {
         // TODO : fix Linear Heading Interpolation for rotation to the right without hard coding value bigger than 180 (line 37)
@@ -83,17 +84,24 @@ public class ClipSpecimenOnBar extends OpMode {
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
 
-        toSample3 = follower.pathBuilder()
-                .addPath(new BezierCurve(
-                        new Point(pushSample2),
-                        new Point(74.866, 20.417, Point.CARTESIAN),
-                        new Point(behindSample3)
-                ))
+        toSpecimenPickup1 = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(pushSample2), new Point(specimenPickup1)))
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
 
-        toHuman3 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(behindSample3), new Point(pushSample3)))
+
+        toBar2 = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(specimenPickup1), new Point(barCliponPose2)))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .build();
+
+        toSpecimenPickup2 = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(barCliponPose2), new Point(specimenPickup1)))
+                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .build();
+
+        toBar3 = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(specimenPickup1), new Point(barCliponPose3)))
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
     }
@@ -150,7 +158,7 @@ public class ClipSpecimenOnBar extends OpMode {
                 }
                 break;
             case(2):
-                if((follower.getPose().getX() > (behindSample1.getX() - 1) && follower.getPose().getY() > (behindSample1.getY() + 1)))
+                if((follower.getPose().getX() > (behindSample1.getX() - 1) && follower.getPose().getY() < (behindSample1.getY() + 1)))
                 {
                     follower.followPath(toHuman1, true);
                     setPathState(3);
@@ -173,15 +181,40 @@ public class ClipSpecimenOnBar extends OpMode {
             case(5):
                 if((follower.getPose().getX() < (pushSample2.getX() + 1) && follower.getPose().getY() < (pushSample2.getY() + 1)))
                 {
-                    follower.followPath(toSample3, true);
-                    setPathState(6);
+                    if (stateTimer.getElapsedTimeSeconds() > 2)
+                    {
+                        follower.followPath(toSpecimenPickup1, true);
+                        setPathState(6);
+                    }
+
                 }
                 break;
+
             case(6):
-                if((follower.getPose().getX() > (behindSample3.getX() - 1) && follower.getPose().getY() > (behindSample3.getY() - 1)))
+                if((follower.getPose().getX() < (specimenPickup1.getX() + 1) && follower.getPose().getY() < (specimenPickup1.getY() + 1)))
                 {
-                    follower.followPath(toHuman3, true);
-                    setPathState(7);
+                    if (stateTimer.getElapsedTimeSeconds() > 2) {
+                        follower.followPath(toBar2, true);
+                        setPathState(7);
+                    }
+                }
+                break;
+            case(7):
+                if((follower.getPose().getX() > (barCliponPose2.getX() - 1) && follower.getPose().getY() < (barCliponPose2.getY() + 1)))
+                {
+                    if (stateTimer.getElapsedTimeSeconds() > 2) {
+                        follower.followPath(toSpecimenPickup2, true);
+                        setPathState(8);
+                    }
+                }
+                break;
+            case(8):
+                if((follower.getPose().getX() < (specimenPickup1.getX() + 1) && follower.getPose().getY() > (specimenPickup1.getY() - 1)))
+                {
+                    if (stateTimer.getElapsedTimeSeconds() > 2) {
+                        follower.followPath(toBar3, true);
+                        setPathState(9);
+                    }
                 }
                 break;
         }

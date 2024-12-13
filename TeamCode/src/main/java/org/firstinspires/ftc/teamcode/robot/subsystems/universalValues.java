@@ -24,7 +24,7 @@ public class universalValues {
     // outtake values for clipping on specimen
 
     public static double OUTTAKE_CLIPON_UP = 0.65;
-    public static double OUTTAKE_CLIPON_DOWN = 0.85;
+    public static double OUTTAKE_CLIPON_DOWN = 0.90;
     public static double OUTTAKE_PICKUP_BAR = 1;
 
     public static double CLAW_TIMER = 1.8;
