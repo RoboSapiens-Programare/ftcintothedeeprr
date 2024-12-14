@@ -11,7 +11,7 @@ public class universalValues {
     public static double INTAKE_INIT = 0.75;
 
     public static double CLAW_OPEN = 0.46;
-    public static double CLAW_CLOSE = 0.515;
+    public static double CLAW_CLOSE = 0.545;
     public static double CLAW_VERTICAL = 0.4;
     public static double CLAW_HORIZONTAL = 0.72;
 
