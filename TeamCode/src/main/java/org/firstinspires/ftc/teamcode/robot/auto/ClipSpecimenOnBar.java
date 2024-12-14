@@ -44,9 +44,9 @@ public class ClipSpecimenOnBar extends OpMode {
     private final Pose pushSample1 = new Pose(18.272, 29.400, Math.toRadians(180));
     private final Pose behindSample2 = new Pose(64.760, 19.069, Math.toRadians(180));
     private final Pose pushSample2 = new Pose(18.272, 18.620, Math.toRadians(180));
-    private final Pose specimenPickup1 = new Pose(25.5, 26.5, Math.toRadians(180));
-    private final Pose barCliponPose2 = new Pose(31.66,68.5, Math.toRadians(180));
-    private final Pose barCliponPose3 = new Pose(31.66, 70.5, Math.toRadians(180));
+    private final Pose specimenPickup1 = new Pose(25, 26.5, Math.toRadians(180));
+    private final Pose barCliponPose2 = new Pose(32.75,68.5, Math.toRadians(180));
+    private final Pose barCliponPose3 = new Pose(32.75, 70.5, Math.toRadians(180));
     private final Pose ParkPose = new Pose(12,40, Math.toRadians(180));
     private final Pose barCliponPose4 = new Pose(31.66, 70.5, Math.toRadians(180));
     private final Pose behindSample3 = new Pose(64.535, 12.556, Math.toRadians(180));
@@ -99,8 +99,7 @@ public class ClipSpecimenOnBar extends OpMode {
                 .build();
 
         toSpecimenPickup1 = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(pushSample2), new Point(52.262, 15.252, Point.CARTESIAN),
-                        new Point(44.411, 28.935, Point.CARTESIAN),new Point(specimenPickup1)))
+                .addPath(new BezierCurve(new Point(pushSample2), new Point(41.411, 18.935, Point.CARTESIAN),new Point(specimenPickup1)))
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
 
@@ -245,19 +244,19 @@ public class ClipSpecimenOnBar extends OpMode {
             case(7):
                 if((follower.getPose().getX() > (barCliponPose2.getX() - 1) && follower.getPose().getY() < (barCliponPose2.getY() + 1)))
                 {
-                    if (stateTimer.getElapsedTimeSeconds() > 0.5)
+                    if (stateTimer.getElapsedTimeSeconds() > 0.75)
                     {
                         if (singleton)
                         {
                             robot.outtake.setPivot(universalValues.OUTTAKE_CLIPON_DOWN);
                             singleton = false;
                         }
-                        if (stateTimer.getElapsedTimeSeconds() > 1) {
+                        if (stateTimer.getElapsedTimeSeconds() > 1.25) {
                             if (singleton2)
                             {
                                 robot.outtake.OpenOuttake(universalValues.OUTTAKE_OPEN_BAR);
                             }
-                            if (stateTimer.getElapsedTimeSeconds() > 1.25)
+                            if (stateTimer.getElapsedTimeSeconds() > 1.50)
                             {
                                 follower.followPath(toSpecimenPickup2, true);
                                 robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
@@ -295,19 +294,19 @@ public class ClipSpecimenOnBar extends OpMode {
             case(9):
                 if((follower.getPose().getX() > (barCliponPose3.getX() - 1) && follower.getPose().getY() < (barCliponPose3.getY() + 1)))
                 {
-                    if (stateTimer.getElapsedTimeSeconds() > 0.5)
+                    if (stateTimer.getElapsedTimeSeconds() > 0.75)
                     {
                         if (singleton)
                         {
                             robot.outtake.setPivot(universalValues.OUTTAKE_CLIPON_DOWN);
                             singleton = false;
                         }
-                        if (stateTimer.getElapsedTimeSeconds() > 1) {
+                        if (stateTimer.getElapsedTimeSeconds() > 1.25) {
                             if (singleton2)
                             {
                                 robot.outtake.OpenOuttake(universalValues.OUTTAKE_OPEN_BAR);
                             }
-                            if (stateTimer.getElapsedTimeSeconds() > 1.25)
+                            if (stateTimer.getElapsedTimeSeconds() > 1.50)
                             {
                                 follower.followPath(park, true);
                                 robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
@@ -334,7 +333,7 @@ public class ClipSpecimenOnBar extends OpMode {
             robot.intake.ManualLevel(600,1);
             robot.outtake.CloseOuttake(universalValues.OUTTAKE_OPEN);
             robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
-            robot.intake.setPivot(universalValues.INTAKE_DOWN+0.1);
+            robot.intake.setPivot(universalValues.INTAKE_DOWN+0.05);
 
             transfersingleton1 = false;
         }
