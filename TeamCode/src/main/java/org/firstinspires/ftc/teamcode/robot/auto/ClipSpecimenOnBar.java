@@ -38,13 +38,13 @@ public class ClipSpecimenOnBar extends OpMode {
 
     // TODO: modify y offset to correct pedro path visualiser offset
 
-    private final Pose startPose = new Pose(10.7,49, Math.toRadians(180));
+    private final Pose startPose = new Pose(7.5,49, Math.toRadians(180));
     private final Pose barCliponPose1 = new Pose(32.75,64.5, Math.toRadians(180));
     private final Pose behindSample1 = new Pose(65, 29.500, Math.toRadians(180));
     private final Pose pushSample1 = new Pose(18.272, 29.400, Math.toRadians(180));
     private final Pose behindSample2 = new Pose(64.760, 19.069, Math.toRadians(180));
     private final Pose pushSample2 = new Pose(18.272, 18.620, Math.toRadians(180));
-    private final Pose specimenPickup1 = new Pose(26.5, 25.5, Math.toRadians(180));
+    private final Pose specimenPickup1 = new Pose(25.5, 26.5, Math.toRadians(180));
     private final Pose barCliponPose2 = new Pose(31.66,68.5, Math.toRadians(180));
     private final Pose barCliponPose3 = new Pose(31.66, 70.5, Math.toRadians(180));
     private final Pose ParkPose = new Pose(12,40, Math.toRadians(180));
@@ -72,6 +72,7 @@ public class ClipSpecimenOnBar extends OpMode {
                                 new Point(behindSample1)
                         )
                 )
+
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
 
@@ -98,7 +99,8 @@ public class ClipSpecimenOnBar extends OpMode {
                 .build();
 
         toSpecimenPickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(pushSample2), new Point(specimenPickup1)))
+                .addPath(new BezierCurve(new Point(pushSample2), new Point(52.262, 15.252, Point.CARTESIAN),
+                        new Point(44.411, 28.935, Point.CARTESIAN),new Point(specimenPickup1)))
                 .setConstantHeadingInterpolation(Math.toRadians(180))
                 .build();
 
@@ -140,6 +142,7 @@ public class ClipSpecimenOnBar extends OpMode {
         transfersingleton4 = true;
         transfersingleton5 = true;
         transfersingleton6 = true;
+        transfersingleton7 = true;
     }
 
     public void autonomousUpdate() {
@@ -148,10 +151,14 @@ public class ClipSpecimenOnBar extends OpMode {
                 robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
                 // TODO : fix intake pivot value on line 53 or make dedicated value in universalValues
                 //robot.intake.setPivot(0.55);
-                    follower.followPath(toBar1,true);
+                follower.followPath(toBar1,true);
                 setPathState(1);
                 break;
             case(1):
+                if (stateTimer.getElapsedTimeSeconds()>0.5)
+                {
+                    robot.intake.setPivot(universalValues.INTAKE_DOWN);
+                }
                 if((follower.getPose().getX() > (barCliponPose1.getX() - 1) && follower.getPose().getY() > (barCliponPose1.getY() - 1))) {
                     if (singleton) {
                         follower.holdPoint(barCliponPose1);
@@ -160,7 +167,7 @@ public class ClipSpecimenOnBar extends OpMode {
                     if (stateTimer.getElapsedTimeSeconds() > 1)
                     {
                         if (singleton2){
-                            robot.outtake.setPivot(universalValues.OUTTAKE_CLIPON_UP);
+                            robot.outtake.setPivot(universalValues.OUTTAKE_CLIPON_DOWN);
                             robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
                             singleton2 = false;
                         }
@@ -208,8 +215,8 @@ public class ClipSpecimenOnBar extends OpMode {
             case(5):
                 if((follower.getPose().getX() < (pushSample2.getX() + 1) && follower.getPose().getY() < (pushSample2.getY() + 1)))
                 {
-                        follower.followPath(toSpecimenPickup1, true);
-                        setPathState(6);
+                    follower.followPath(toSpecimenPickup1, true);
+                    setPathState(6);
                 }
                 break;
 
@@ -226,11 +233,11 @@ public class ClipSpecimenOnBar extends OpMode {
                 }
                 if((follower.getPose().getX() < (specimenPickup1.getX() + 1) && follower.getPose().getY() < (specimenPickup1.getY() + 1)))
                 {
-                        singleton = false;
-                        if (isSpecimeninClaw && singleton2) {
-                            follower.followPath(toBar2, true);
-                            singleton2 = false;
-                        }
+                    singleton = false;
+                    if (isSpecimeninClaw && singleton2) {
+                        follower.followPath(toBar2, true);
+                        singleton2 = false;
+                    }
                 }
 
 
@@ -238,46 +245,49 @@ public class ClipSpecimenOnBar extends OpMode {
             case(7):
                 if((follower.getPose().getX() > (barCliponPose2.getX() - 1) && follower.getPose().getY() < (barCliponPose2.getY() + 1)))
                 {
-                        if (stateTimer.getElapsedTimeSeconds() > 0.5)
+                    if (stateTimer.getElapsedTimeSeconds() > 0.5)
+                    {
+                        if (singleton)
                         {
-                            if (singleton)
-                            {
-                                robot.outtake.setPivot(universalValues.OUTTAKE_CLIPON_DOWN);
-                                singleton = false;
-                            }
-                            if (stateTimer.getElapsedTimeSeconds() > 1) {
-                                if (singleton2)
-                                {
-                                    robot.outtake.OpenOuttake(universalValues.OUTTAKE_OPEN_BAR);
-                                }
-                                if (stateTimer.getElapsedTimeSeconds() > 1.25)
-                                {
-                                    follower.followPath(toSpecimenPickup2, true);
-                                    robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
-                                    robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
-                                    setPathState(8);
-                                }
-                            }
-
+                            robot.outtake.setPivot(universalValues.OUTTAKE_CLIPON_DOWN);
+                            singleton = false;
                         }
+                        if (stateTimer.getElapsedTimeSeconds() > 1) {
+                            if (singleton2)
+                            {
+                                robot.outtake.OpenOuttake(universalValues.OUTTAKE_OPEN_BAR);
+                            }
+                            if (stateTimer.getElapsedTimeSeconds() > 1.25)
+                            {
+                                follower.followPath(toSpecimenPickup2, true);
+                                robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
+                                robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
+                                isSpecimeninClaw = false;
+                                isTransferDone = false;
+                                setPathState(8);
+                            }
+                        }
+
+                    }
 
 
 
                 }
                 break;
             case(8):
-                if (!singleton)
+                if(!singleton)
                 {
                     transfer();
                     if (isTransferDone) {
                         setPathState(9);
                     }
                 }
-                if((follower.getPose().getX() > (specimenPickup1.getX() - 1) && follower.getPose().getY() > (specimenPickup1.getY() - 1)))
+                if((follower.getPose().getX() < (specimenPickup1.getX() + 1) && follower.getPose().getY() < (specimenPickup1.getY() + 1)))
                 {
                     singleton = false;
-                    if (isSpecimeninClaw) {
+                    if (isSpecimeninClaw && singleton2) {
                         follower.followPath(toBar3, true);
+                        singleton2 = false;
                     }
                 }
 
@@ -319,47 +329,48 @@ public class ClipSpecimenOnBar extends OpMode {
         }
         if (transfersingleton1)
         {
-            robot.intake.OpenIntake(universalValues.CLAW_OPEN-0.2);
+            robot.intake.OpenIntake(universalValues.CLAW_OPEN-0.275);
             robot.intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
-            robot.intake.ManualLevel(500,1);
+            robot.intake.ManualLevel(600,1);
             robot.outtake.CloseOuttake(universalValues.OUTTAKE_OPEN);
             robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
             robot.intake.setPivot(universalValues.INTAKE_DOWN+0.1);
 
             transfersingleton1 = false;
         }
-        if (transferTimer.getElapsedTimeSeconds() > 1)
+        if (transferTimer.getElapsedTimeSeconds() > 2)
         {
             if (transfersingleton2)
             {
                 robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
-                isSpecimeninClaw = true;
+
                 transfersingleton2 = false;
             }
-            if (transferTimer.getElapsedTimeSeconds() > 1.25)
+            if (transferTimer.getElapsedTimeSeconds() > 2.25)
             {
                 if (transfersingleton3) {
                     robot.intake.setPivot(universalValues.INTAKE_UP);
+                    isSpecimeninClaw = true;
                     transfersingleton3 = false;
                 }
-                if (transferTimer.getElapsedTimeSeconds() > 1.25)
+                if (transferTimer.getElapsedTimeSeconds() > 2.25)
                 {
                     if (transfersingleton4) {
                         robot.intake.ManualLevel(0, 1);
                         transfersingleton4 = false;
 
                     }
-                    if (transferTimer.getElapsedTimeSeconds() > 2.25)
+                    if (transferTimer.getElapsedTimeSeconds() > 3.25)
                     {
                         if (transfersingleton6)
                         {
                             robot.outtake.OpenOuttake(universalValues.OUTTAKE_CLOSE-0.075);
                             transfersingleton6 = false;
                         }
-                        if (transferTimer.getElapsedTimeSeconds() > 2.5)
+                        if (transferTimer.getElapsedTimeSeconds() > 3.5)
                         {
                             robot.intake.OpenIntake(universalValues.CLAW_OPEN);
-                            if (transferTimer.getElapsedTimeSeconds() > 2.75)
+                            if (transferTimer.getElapsedTimeSeconds() > 3.75)
                             {
                                 if (transfersingleton5) {
                                     robot.intake.ManualLevel(300, 1);
@@ -367,10 +378,10 @@ public class ClipSpecimenOnBar extends OpMode {
                                     transfersingleton5 = false;
                                 }
                                 robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
-                                if (transferTimer.getElapsedTimeSeconds() > 3)
+                                if (transferTimer.getElapsedTimeSeconds() > 4)
                                 {
                                     robot.intake.setPivot(universalValues.INTAKE_DOWN+0.1);
-                                    if (transferTimer.getElapsedTimeSeconds() > 3.5)
+                                    if (transferTimer.getElapsedTimeSeconds() > 4.5)
                                     {
                                         robot.intake.ManualLevel(0, 1);
                                         isTransferDone = true;
@@ -396,8 +407,7 @@ public class ClipSpecimenOnBar extends OpMode {
 
         follower.setStartingPose(startPose);
 
-        //robot.intake.setPivot(universalValues.INTAKE_DOWN);
-        robot.intake.CloseIntake(universalValues.CLAW_OPEN-0.2);
+        robot.intake.setPivot(universalValues.INTAKE_INIT);
         robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
         robot.intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
         robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
@@ -430,6 +440,7 @@ public class ClipSpecimenOnBar extends OpMode {
     @Override
     public void start() {
         setPathState(0);
+        robot.intake.CloseIntake(universalValues.CLAW_OPEN-0.2);
     }
 
     @Override

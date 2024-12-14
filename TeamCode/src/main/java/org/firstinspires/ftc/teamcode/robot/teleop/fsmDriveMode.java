@@ -66,6 +66,7 @@ public class fsmDriveMode extends OpMode {
         if (gamepad2.square) {
             robot.outtake.setPivot(OUTTAKE_CLIPON_UP);
             intakeTimer.reset();
+            robot.outtake.OpenOuttake(OUTTAKE_CLOSE);
             intakeState = IntakeState.OUTTAKE_SAMPLE;
         }
     }
@@ -75,7 +76,7 @@ public class fsmDriveMode extends OpMode {
             robot.intake.setPivot(INTAKE_DOWN);
             robot.intake.setClawPivot(CLAW_HORIZONTAL);
             clawPivot = CLAW_HORIZONTAL;
-            robot.intake.OpenIntake(CLAW_OPEN);
+            robot.intake.OpenIntake(CLAW_OPEN - 0.04);
             intakeTimer.reset();
             intakeState = IntakeState.INTAKE_CLAW_COLLECT_POSITION;
         }
@@ -122,9 +123,11 @@ public class fsmDriveMode extends OpMode {
             robot.intake.setClawPivot(CLAW_HORIZONTAL);
             clawPivot = CLAW_HORIZONTAL;
             robot.intake.setPivot(INTAKE_UP);
-            robot.intake.ManualLevel(INTAKE_LOW, 1);
-            intakeState = IntakeState.INTAKE_RETRACT;
-            intakeTimer.reset();
+            if(intakeTimer.seconds() > 0.5) {
+                robot.intake.ManualLevel(INTAKE_LOW, 1);
+                intakeTimer.reset();
+                intakeState = IntakeState.INTAKE_RETRACT;
+            }
         }
     }
 
@@ -134,9 +137,11 @@ public class fsmDriveMode extends OpMode {
             robot.intake.setPivot(INTAKE_UP);
             if (intakeTimer.seconds() > CLAW_TIMER) {
                 robot.intake.OpenIntake(CLAW_OPEN);
-                robot.outtake.CloseOuttake(OUTTAKE_CLOSE);
-                robot.intake.ManualLevel(300,1);
-                intakeTimer.reset();
+                robot.outtake.CloseOuttake(OUTTAKE_CLOSE - 0.07);
+                if(intakeTimer.seconds() > CLAW_TIMER + 0.3) {
+                    robot.intake.ManualLevel(300, 1);
+                    intakeTimer.reset();
+                }
             }
             if(robot.intake.intakeMotor.getCurrentPosition() > 200){
                 robot.intake.setPivot(INTAKE_INT);
