@@ -39,15 +39,15 @@ public class ClipSpecimenOnBar extends OpMode {
     // TODO: modify y offset to correct pedro path visualiser offset
 
     private final Pose startPose = new Pose(7.5,49, Math.toRadians(180));
-    private final Pose barCliponPose1 = new Pose(32.75,64.5, Math.toRadians(180));
+    private final Pose barCliponPose1 = new Pose(32.75,67.5, Math.toRadians(180));
     private final Pose behindSample1 = new Pose(65, 29.500, Math.toRadians(180));
     private final Pose pushSample1 = new Pose(18.272, 29.400, Math.toRadians(180));
     private final Pose behindSample2 = new Pose(64.760, 19.069, Math.toRadians(180));
     private final Pose pushSample2 = new Pose(18.272, 18.620, Math.toRadians(180));
-    private final Pose specimenPickup1 = new Pose(25, 26.5, Math.toRadians(180));
-    private final Pose barCliponPose2 = new Pose(32.75,68.5, Math.toRadians(180));
-    private final Pose barCliponPose3 = new Pose(32.75, 70.5, Math.toRadians(180));
-    private final Pose ParkPose = new Pose(12,40, Math.toRadians(180));
+    private final Pose specimenPickup1 = new Pose(24, 28.5, Math.toRadians(180));
+    private final Pose barCliponPose2 = new Pose(33.25,69.5, Math.toRadians(180));
+    private final Pose barCliponPose3 = new Pose(33.85, 71.5, Math.toRadians(180));
+    private final Pose ParkPose = new Pose(6,40, Math.toRadians(180));
     private final Pose barCliponPose4 = new Pose(31.66, 70.5, Math.toRadians(180));
     private final Pose behindSample3 = new Pose(64.535, 12.556, Math.toRadians(180));
     private final Pose pushSample3 = new Pose(18.272, 12.332, Math.toRadians(180));
@@ -68,7 +68,7 @@ public class ClipSpecimenOnBar extends OpMode {
                                 new Point(barCliponPose1),
                                 new Point(29.420, 39.875, Point.CARTESIAN),
                                 new Point(38.628, 34.485, Point.CARTESIAN),
-                                new Point(61.535, 37.404, Point.CARTESIAN),
+                                new Point(61.535, 42.404, Point.CARTESIAN),
                                 new Point(behindSample1)
                         )
                 )
@@ -121,7 +121,7 @@ public class ClipSpecimenOnBar extends OpMode {
 
         park = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(barCliponPose3), new Point(ParkPose)))
-                .setConstantHeadingInterpolation(Math.toRadians(180))
+                .setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(90))
                 .build();
     }
 
@@ -321,16 +321,11 @@ public class ClipSpecimenOnBar extends OpMode {
     }
 
     public void transfer() {
-        if (transfersingleton7)
-        {
-            transferTimer.resetTimer();
-            transfersingleton7 = false;
-        }
         if (transfersingleton1)
         {
             robot.intake.OpenIntake(universalValues.CLAW_OPEN-0.275);
             robot.intake.setClawPivot(universalValues.CLAW_HORIZONTAL);
-            robot.intake.ManualLevel(600,1);
+
             robot.outtake.CloseOuttake(universalValues.OUTTAKE_OPEN);
             robot.outtake.setPivot(universalValues.OUTTAKE_COLLECT);
             robot.intake.setPivot(universalValues.INTAKE_DOWN+0.05);
@@ -339,37 +334,46 @@ public class ClipSpecimenOnBar extends OpMode {
         }
         if (transferTimer.getElapsedTimeSeconds() > 2)
         {
+            if (transfersingleton7)
+            {
+                robot.intake.ManualLevel(550,1);
+                transfersingleton7 = false;
+            }
+
+        }
+        if (transferTimer.getElapsedTimeSeconds() > 3.5)
+        {
             if (transfersingleton2)
             {
                 robot.intake.CloseIntake(universalValues.CLAW_CLOSE);
 
                 transfersingleton2 = false;
             }
-            if (transferTimer.getElapsedTimeSeconds() > 2.25)
+            if (transferTimer.getElapsedTimeSeconds() > 4.25)
             {
                 if (transfersingleton3) {
                     robot.intake.setPivot(universalValues.INTAKE_UP);
                     isSpecimeninClaw = true;
                     transfersingleton3 = false;
                 }
-                if (transferTimer.getElapsedTimeSeconds() > 2.25)
+                if (transferTimer.getElapsedTimeSeconds() > 4.25)
                 {
                     if (transfersingleton4) {
                         robot.intake.ManualLevel(0, 1);
                         transfersingleton4 = false;
 
                     }
-                    if (transferTimer.getElapsedTimeSeconds() > 3.25)
+                    if (transferTimer.getElapsedTimeSeconds() > 5.25)
                     {
                         if (transfersingleton6)
                         {
                             robot.outtake.OpenOuttake(universalValues.OUTTAKE_CLOSE-0.075);
                             transfersingleton6 = false;
                         }
-                        if (transferTimer.getElapsedTimeSeconds() > 3.5)
+                        if (transferTimer.getElapsedTimeSeconds() > 5.5)
                         {
                             robot.intake.OpenIntake(universalValues.CLAW_OPEN);
-                            if (transferTimer.getElapsedTimeSeconds() > 3.75)
+                            if (transferTimer.getElapsedTimeSeconds() > 5.75)
                             {
                                 if (transfersingleton5) {
                                     robot.intake.ManualLevel(300, 1);
@@ -377,10 +381,10 @@ public class ClipSpecimenOnBar extends OpMode {
                                     transfersingleton5 = false;
                                 }
                                 robot.outtake.CloseOuttake(universalValues.OUTTAKE_CLOSE);
-                                if (transferTimer.getElapsedTimeSeconds() > 4)
+                                if (transferTimer.getElapsedTimeSeconds() > 6)
                                 {
                                     robot.intake.setPivot(universalValues.INTAKE_DOWN+0.1);
-                                    if (transferTimer.getElapsedTimeSeconds() > 4.5)
+                                    if (transferTimer.getElapsedTimeSeconds() > 6.5)
                                     {
                                         robot.intake.ManualLevel(0, 1);
                                         isTransferDone = true;
@@ -443,6 +447,6 @@ public class ClipSpecimenOnBar extends OpMode {
     }
 
     @Override
-    public void     stop() {
+    public void stop() {
     }
 }
